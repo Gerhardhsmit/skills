@@ -1,0 +1,88 @@
+{
+  "project": "OYA Wind Farm — Fiber Optic",
+  "turbines": 18,
+  "last_updated": "2026-06-10",
+  "wtg": {
+    "WTG-07": {
+      "total_splices": 24,
+      "total_ac_lc_changes": 12,
+      "rmu_completed": 0,
+      "mate_mask_completed": 0,
+      "drawing_marked": false,
+      "tested": 0,
+      "has_challenges": false,
+      "daily_reports": [
+        {
+          "date": "2026-06-10",
+          "location": "",
+          "splices_completed": 24,
+          "rmu_completed": 0,
+          "mate_mask_completed": 0,
+          "total_tested": 0,
+          "drawing_marked": false,
+          "ac_lc_changes": 12,
+          "challenges": "No",
+          "photos": true
+        }
+      ]
+    },
+    "WTG-08": {
+      "total_splices": 24,
+      "total_ac_lc_changes": 12,
+      "rmu_completed": 0,
+      "mate_mask_completed": 0,
+      "drawing_marked": false,
+      "tested": 0,
+      "has_challenges": false,
+      "daily_reports": [
+        {
+          "date": "2026-06-16",
+          "location": "",
+          "splices_completed": 24,
+          "rmu_completed": 0,
+          "mate_mask_completed": 0,
+          "total_tested": 0,
+          "drawing_marked": false,
+          "ac_lc_changes": 12,
+          "challenges": "No",
+          "photos": true
+        }
+      ]
+    },
+    "WTG-09": {
+      "total_splices": 28,
+      "total_ac_lc_changes": 10,
+      "rmu_completed": 0,
+      "mate_mask_completed": 0,
+      "drawing_marked": false,
+      "tested": 0,
+      "has_challenges": true,
+      "daily_reports": [
+        {
+          "date": "2026-06-10",
+          "location": "Basement",
+          "splices_completed": 8,
+          "rmu_completed": 0,
+          "mate_mask_completed": 0,
+          "total_tested": 0,
+          "drawing_marked": false,
+          "ac_lc_changes": 0,
+          "challenges": "Splicing fibers through to expand capacity for WTG-11",
+          "photos": true
+        },
+        {
+          "date": "2026-06-10",
+          "location": "",
+          "splices_completed": 20,
+          "rmu_completed": 0,
+          "mate_mask_completed": 0,
+          "total_tested": 0,
+          "drawing_marked": false,
+          "ac_lc_changes": 10,
+          "challenges": "Added splices for overhead fiber at WTG-09",
+          "photos": true
+        }
+      ]
+    }
+  }
+}
