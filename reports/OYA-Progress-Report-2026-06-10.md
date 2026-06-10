@@ -5,6 +5,8 @@
 **Field Technician:** Freddy Mackay
 **Submitted to:** Specafrica / Sinohydro
 **Project Reference:** ZA-OYA0-EN-EL-CC-9526 (WEF Fibre Optic Single Line Diagram REV 7)
+**Project Completion Deadline:** 19 June 2026
+**Days Remaining:** 9
 
 ---
 
@@ -98,13 +100,26 @@ Based on field drawings and site verification:
 
 ---
 
-## 7. PLANNED WORK — NEXT PERIOD
+## 7. COMPLETION PLAN — DEADLINE 19 JUNE 2026
 
-- Continue splicing at WTG-10 through WTG-12
-- Resolve fiber fault on WTG-01 → PV F01 route
-- OTDR testing to advance in line with completed splicing
-- Update as-built drawings at all completed turbines
-- Complete remaining AC→LC connector changes at WTG-01
+**9 working days remaining. Target: 1–2 turbines per day.**
+
+| Day | Date | Target WTGs | Notes |
+|-----|------|------------|-------|
+| 1 | 11 Jun | WTG-04, WTG-05 | Continue northward from WTG-04 |
+| 2 | 12 Jun | WTG-06, WTG-10 | |
+| 3 | 13 Jun | WTG-11, WTG-12 | WTG-11 benefits from WTG-09 dome capacity expansion |
+| 4 | 14 Jun | WTG-13, WTG-14 | |
+| 5 | 15 Jun | WTG-15, WTG-16 | |
+| 6 | 16 Jun | WTG-17, WTG-18 | |
+| 7 | 17 Jun | Snagging + OTDR testing outstanding spans | |
+| 8 | 18 Jun | Drawings mark-up, connector changes, fault rectification | Resolve WTG-01→PV F01 fault |
+| 9 | 19 Jun | Final OTDR pass, handover documentation | **DEADLINE** |
+
+**Risks to completion schedule:**
+- WTG-01→PV F01 fault must be rectified before final testing
+- As-built drawings not yet marked at any turbine — this must run concurrently with splicing
+- Access to all turbines (WTG-04 through WTG-18) must be confirmed in advance
 
 ---
 
