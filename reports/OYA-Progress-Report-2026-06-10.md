@@ -2,6 +2,7 @@
 ## Fiber Optic Installation — Field Progress Report
 **Report Date:** 10 June 2026
 **Prepared by:** Site Manager — OYA Fiber Team
+**Field Technician:** Freddy Mackay
 **Submitted to:** Specafrica / Sinohydro
 **Project Reference:** ZA-OYA0-EN-EL-CC-9526 (WEF Fibre Optic Single Line Diagram REV 7)
 
@@ -123,4 +124,5 @@ Based on field drawings and site verification:
 ---
 
 *Report compiled from daily field technician WhatsApp reports and OTDR test photographs submitted on 10 June 2026.*
+*Field work conducted and documented by Freddy Mackay.*
 *All OTDR tests performed on EXFO MaxTester unit 084 464 2245.*
