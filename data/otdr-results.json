@@ -1,0 +1,89 @@
+{
+  "project": "OYA Wind Farm — Fiber Optic OTDR Test Log",
+  "instrument": "EXFO MaxTester (084 464 2245)",
+  "wavelength_nm": 1310,
+  "fiber_type": "SM/9um",
+  "last_updated": "2026-06-10",
+  "spans": [
+    {
+      "from": "WTG-01", "to": "WTG-02",
+      "fibers": [
+        { "fiber": "F1", "result": "PASS", "distance_km": 1.96 },
+        { "fiber": "F2", "result": "PASS", "distance_km": 1.96 },
+        { "fiber": "F3", "result": "PASS", "distance_km": 1.96 },
+        { "fiber": "F4", "result": "PASS", "distance_km": 1.96 }
+      ]
+    },
+    {
+      "from": "WTG-01", "to": "PV",
+      "fibers": [
+        {
+          "fiber": "F01", "result": "FAIL", "distance_km": 5.0066,
+          "fault": {
+            "position_km": 4.9271,
+            "loss_db": 4.216,
+            "reflectance_db": -27.8,
+            "attenuation_db_per_km": 43.77,
+            "cumulative_db": 10.280,
+            "note": "HIGH LOSS — bad splice or damaged connector at ~4.93 km. Resplice or replace connector required."
+          }
+        },
+        { "fiber": "F02", "result": "PASS", "distance_km": 4.9265, "cumulative_db": 2.542 },
+        { "fiber": "F03", "result": "PASS", "distance_km": 4.9188, "note": "End reflectance >-19.6 dB — acceptable" },
+        { "fiber": "F04", "result": "PASS", "distance_km": 5.0 }
+      ]
+    },
+    {
+      "from": "WTG-02", "to": "WTG-03",
+      "fibers": [
+        { "fiber": "F1",  "result": "PASS", "distance_km": 0.789, "loss_db": 0.451, "attenuation_db_per_km": 0.572, "cumulative_db": 0.451 },
+        { "fiber": "F2",  "result": "PASS", "distance_km": 0.8 },
+        { "fiber": "F4",  "result": "PASS", "distance_km": 0.8 },
+        { "fiber": "F13", "result": "PASS", "distance_km": 1.8 },
+        { "fiber": "F15", "result": "PASS", "distance_km": 1.8 },
+        { "fiber": "F16", "result": "PASS", "distance_km": 2.0 }
+      ]
+    },
+    {
+      "from": "WTG-03", "to": "WTG-02",
+      "fibers": [
+        { "fiber": "F1", "result": "PASS", "distance_km": 0.8 },
+        { "fiber": "F2", "result": "PASS", "distance_km": 0.8 },
+        { "fiber": "F3", "result": "PASS", "distance_km": 0.8 },
+        { "fiber": "F4", "result": "PASS", "distance_km": 0.8 }
+      ]
+    },
+    {
+      "from": "WTG-03", "to": "WTG-04",
+      "fibers": [
+        { "fiber": "F13", "result": "PASS", "distance_km": 2.0 },
+        { "fiber": "F15", "result": "PASS", "distance_km": 2.0 },
+        { "fiber": "F16", "result": "PASS", "distance_km": 2.0 },
+        { "fiber": "F_span", "result": "PASS", "distance_km": 2.0 }
+      ]
+    }
+  ],
+  "summary": {
+    "total_tests": 22,
+    "passed": 21,
+    "failed": 1,
+    "pass_rate_percent": 95.5,
+    "spans_tested": ["WTG-01→WTG-02", "WTG-01→PV", "WTG-02→WTG-03", "WTG-03→WTG-02", "WTG-03→WTG-04"],
+    "spans_not_yet_tested": [
+      "WTG-04→WTG-05", "WTG-05→WTG-06", "WTG-06→WTG-07",
+      "WTG-07→WTG-08", "WTG-08→WTG-09", "WTG-09→WTG-10",
+      "WTG-10→WTG-11", "WTG-11→WTG-12", "WTG-12→WTG-13",
+      "WTG-13→WTG-14", "WTG-14→WTG-15", "WTG-15→WTG-16",
+      "WTG-16→WTG-17", "WTG-17→WTG-18"
+    ],
+    "failures": [
+      {
+        "span": "WTG-01 to PV",
+        "fiber": "F01",
+        "fault_position_km": 4.9271,
+        "loss_db": 4.216,
+        "action_required": "Investigate and resplice/replace connector at ~4.93 km on PV fiber route"
+      }
+    ]
+  }
+}

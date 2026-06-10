@@ -1,0 +1,29 @@
+{
+  "description": "OYA Wind Farm — Fiber Optic splice tray spec per WTG (all 18 turbines, 36-port tray)",
+  "drawing_ref": "ZA-OYA0-EN-EL-CC-9526 WEF FIBRE OPTIC SINGLE LINE DIAGRAM REV 7",
+  "port_layout": {
+    "mainline_input": { "ports": "1-12", "fibers": 12, "connector": "LC", "label": "Mainline Input" },
+    "mainline_output": { "ports": "13-24", "fibers": 12, "connector": "LC", "label": "Mainline Output" },
+    "rmu": { "ports": "25-28", "fibers": 4, "connector": "LC", "label": "RMU" },
+    "met_mast": { "ports": "29-32", "fibers": 4, "connector": "SC", "label": "Met Mast" },
+    "spare": { "ports": "33-36", "fibers": 4, "connector": "N/A", "label": "Spare — leave empty" }
+  },
+  "splices_per_wtg": {
+    "mainline_only": 24,
+    "with_rmu": 28,
+    "with_met_mast": 32,
+    "max_active": 32
+  },
+  "notes": [
+    "If no RMU connection at a WTG, leave ports 25-28 spare",
+    "If no Met Mast connection at a WTG, leave ports 29-32 spare",
+    "Dome splice enclosure in tower basement carries through-fiber between WTGs",
+    "AC→LC connector changes counted separately — existing APC/SC connectors replaced with LC"
+  ],
+  "wtg_variants": {
+    "WTG-09": {
+      "note": "Has basement dome splice — fiber runs through to WTG-11. Counts as 2 work locations.",
+      "locations": ["basement_dome", "main_tray"]
+    }
+  }
+}

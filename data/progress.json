@@ -3,6 +3,53 @@
   "turbines": 18,
   "last_updated": "2026-06-10",
   "wtg": {
+    "WTG-01": {
+      "total_splices": 24,
+      "total_ac_lc_changes": 0,
+      "rmu_completed": 0,
+      "mate_mask_completed": 0,
+      "drawing_marked": false,
+      "tested": 0,
+      "has_challenges": false,
+      "notes": "Tray labelled: ports 1-12 TO WTG-2, ports 13-32 OVH. Yellow pigtails (old connectors) present — AC→LC changes pending.",
+      "otdr_results": [
+        { "span": "WTG-01 to WTG-02", "fiber": "F1", "result": "PASS", "wavelength_nm": 1310, "distance_km": 1.96 },
+        { "span": "WTG-01 to WTG-02", "fiber": "F2", "result": "PASS", "wavelength_nm": 1310, "distance_km": 1.96 },
+        { "span": "WTG-01 to WTG-02", "fiber": "F4", "result": "PASS", "wavelength_nm": 1310, "distance_km": 1.96 },
+        {
+          "span": "WTG-01 to PV",
+          "fiber": "F01",
+          "result": "FAIL",
+          "wavelength_nm": 1310,
+          "distance_km": 5.0066,
+          "fault": {
+            "event_no": 4,
+            "position_km": 4.9271,
+            "loss_db": 4.216,
+            "reflectance_db": -27.8,
+            "attenuation_db_per_km": 43.77,
+            "cumulative_db": 10.280,
+            "description": "High loss event — likely bad splice or damaged connector at ~4.93 km from WTG-01"
+          }
+        },
+        { "span": "WTG-01 to PV", "fiber": "F02", "result": "PASS", "wavelength_nm": 1310, "distance_km": 4.9265, "cumulative_db": 2.542 }
+      ],
+      "daily_reports": []
+    },
+    "WTG-02": {
+      "total_splices": 0,
+      "total_ac_lc_changes": 0,
+      "rmu_completed": 0,
+      "mate_mask_completed": 0,
+      "drawing_marked": false,
+      "tested": 0,
+      "has_challenges": false,
+      "otdr_results": [
+        { "span": "WTG-02 to WTG-03", "fiber": "F2", "result": "PASS", "wavelength_nm": 1310, "distance_km": 0.8 },
+        { "span": "WTG-02 to WTG-03", "fiber": "F15", "result": "PASS", "wavelength_nm": 1310, "distance_km": 1.8 }
+      ],
+      "daily_reports": []
+    },
     "WTG-07": {
       "total_splices": 24,
       "total_ac_lc_changes": 12,
@@ -11,6 +58,8 @@
       "drawing_marked": false,
       "tested": 0,
       "has_challenges": false,
+      "notes": "RMU-7 dome splice located here per network topology diagram.",
+      "otdr_results": [],
       "daily_reports": [
         {
           "date": "2026-06-10",
@@ -34,6 +83,8 @@
       "drawing_marked": false,
       "tested": 0,
       "has_challenges": false,
+      "notes": "Dome between WTG-08 and WTG-09 installed — inline splice closure on inter-turbine cable.",
+      "otdr_results": [],
       "daily_reports": [
         {
           "date": "2026-06-16",
@@ -57,6 +108,8 @@
       "drawing_marked": false,
       "tested": 0,
       "has_challenges": true,
+      "notes": "RMU-9 dome in tower basement — carries through-fiber for WTG-11 expansion. Dome between WTG-08 and WTG-09 also installed.",
+      "otdr_results": [],
       "daily_reports": [
         {
           "date": "2026-06-10",
