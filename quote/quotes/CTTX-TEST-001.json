@@ -1,0 +1,38 @@
+{
+  "quote_ref": "CTTX-TEST-001",
+  "date": "2024/11/04",
+  "valid_days": 7,
+  "roe": 13.84692,
+  "factor": 0.8,
+  "vat_rate": 15,
+  "company": {
+    "name": "CTTX",
+    "reg": "2016/406552/07",
+    "vat": "4470275803",
+    "po_email": "finance@cttx.co.za",
+    "tel": "",
+    "website": "www.cttx.co.za"
+  },
+  "client": {
+    "attention": "John Smith",
+    "company": "Acme Networks",
+    "email": "john@acmenetworks.co.za"
+  },
+  "scope": "Supply and installation of 18m mast with cabinet and invertor system.\n\nScope includes:\n- 18m lattice mast installation with stays, cladding and concrete encased ducting\n- Cabinet supply and installation\n- Invertor and power system installation\n- Cable routes and terminations\n- PTP 820C 18GHz microwave links (x2)\n- ePMP 5GHz access points and subscriber modules\n- Full commissioning and testing",
+  "items": [
+    {"description": "5 GHz PMP 450i Integrated Access Point, 90 degree", "qty": 2, "item_cost": 12500},
+    {"description": "PoE, 30.5W, 56V, 5GbE DC Injector", "qty": 2, "item_cost": 850},
+    {"description": "Power Cord (P.O.E)", "qty": 2, "item_cost": 120},
+    {"description": "PTP 820C Radio 18GHz,TR1010,ChLow,Hi,18710-19220MHz", "qty": 1, "item_cost": 48000},
+    {"description": "PTP 820C Radio 18GHz,TR1010,ChLow,Lo,17700-18200MHz", "qty": 1, "item_cost": 48000},
+    {"description": "PTP 820 Glands_x5_KIT", "qty": 2, "item_cost": 350},
+    {"description": "PTP 820/850 Act.Key - Capacity 500M", "qty": 2, "item_cost": 9500},
+    {"description": "RF Elements 2ft UltraDish TP 27 RF-UD-TP27", "qty": 2, "item_cost": 4200},
+    {"description": "ePMP 5 GHz Force 400C kit", "qty": 2, "item_cost": 6800},
+    {"description": "5 GHz 450b - High Gain - ROW", "qty": 2, "item_cost": 7200},
+    {"description": "Cat5E UTP Black Sleeving", "qty": 800, "item_cost": 8},
+    {"description": "Mast Maintenance, stays, cladding, concrete encase duct", "qty": 1, "item_cost": 35000},
+    {"description": "Cable routes", "qty": 1, "item_cost": 8500}
+  ],
+  "terms": []
+}
