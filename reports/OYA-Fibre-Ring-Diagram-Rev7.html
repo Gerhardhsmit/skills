@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>OYA Wind Farm — Fibre Optic Ring Diagram | CTTX Services</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Arial, sans-serif; background: #f0f4f8; padding: 16px; }
+.header { background: #0D2E5C; color: #fff; padding: 14px 20px; border-radius: 8px; margin-bottom: 12px; }
+.header h1 { font-size: 15px; margin-bottom: 3px; }
+.header p { font-size: 11px; opacity: 0.8; line-height: 1.5; }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; background: #fff; padding: 10px 14px; border-radius: 6px; margin-bottom: 12px; font-size: 11px; align-items: center; }
+.leg { display: flex; align-items: center; gap: 5px; }
+.leg-dot { width: 14px; height: 14px; border-radius: 3px; flex-shrink: 0; }
+.scroll-wrap { overflow-x: auto; background: #fff; border-radius: 8px; padding: 16px 10px; box-shadow: 0 1px 4px rgba(0,0,0,.1); }
+.note { font-size: 11px; color: #444; margin-top: 12px; background: #fff8e1; padding: 10px 14px; border-radius: 6px; border-left: 3px solid #f9a825; line-height: 1.7; }
+.note b { color: #0D2E5C; }
+.tooltip { position: fixed; background: #1a2a45; color: #fff; padding: 10px 14px; border-radius: 8px;
+  font-size: 12px; pointer-events: none; display: none; z-index: 9999; line-height: 1.85; max-width: 300px;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.4); white-space: pre-wrap; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>OYA Wind Farm — Fibre Optic Ring Network &amp; OTDR Loss Map</h1>
+  <p>CTTX Services &nbsp;|&nbsp; Ref: CTTX-OYA-OTDR-2026-01 &nbsp;|&nbsp; Drawing: ZA-OYA0-EN-EL-CC-9526 Rev 7 &nbsp;|&nbsp; G.652D Singlemode Ring &nbsp;|&nbsp; Node budget ≤1.20 dB (CTTX scope) &nbsp;|&nbsp; Cable span ≤1.00 dB/km (client infrastructure)</p>
+</div>
+<div class="legend">
+  <b style="font-size:11px;margin-right:2px">NODE colour = CTTX workmanship:</b>
+  <div class="leg"><div class="leg-dot" style="background:#2e7d32"></div><b>CTTX COMPLIANT</b></div>
+  <div class="leg"><div class="leg-dot" style="background:#E65C00"></div><b>CTTX ACTION REQ'D</b></div>
+  <div class="leg"><div class="leg-dot" style="background:#1255A0"></div>CLIENT CABLE OBS (node OK)</div>
+  <div class="leg" style="border-left:2px solid #ccc;padding-left:14px;margin-left:4px"><b>SPAN:</b></div>
+  <div class="leg"><div style="width:24px;height:3px;background:#c0392b;border-top:2px dashed #c0392b"></div>&nbsp;Client cable fault on span</div>
+  <div class="leg"><div class="leg-dot" style="background:#e65100;border-radius:50%"></div>Cable Break / Repair Joint</div>
+  <div class="leg"><div class="leg-dot" style="background:#0D2E5C"></div>OEM Building</div>
+  <div class="leg"><div class="leg-dot" style="background:#546e7a;border-radius:50%"></div>RMU Branch</div>
+  <div class="leg"><div class="leg-dot" style="background:#00796b;border-radius:50%"></div>Met Mast</div>
+  <div class="leg" style="margin-left:auto;color:#666;font-style:italic;">Hover nodes for OTDR detail &nbsp;·&nbsp; Distances in metres &nbsp;·&nbsp; IFC Rev 7</div>
+</div>
+<div class="scroll-wrap">
+  <svg id="mainsvg" xmlns="http://www.w3.org/2000/svg"></svg>
+</div>
+<div class="note">
+  <b>Ring topology (ZA-OYA0-EN-EL-CC-9526 Rev 7):</b> 24-core G.652D singlemode fibre ring. OEM Building connects to both ring ends via 48-core OPGW overhead sections.<br>
+  <b>Ring Arm 1 (top):</b> OEM ──(OPGW 1367m+157m FO)──► WTG-01 ──1824m──► WTG-02 ──682m──► WTG-03 ──1907m──► WTG-04 ──2124m──► WTG-05 ──548m──► WTG-06 ──598m──► WTG-07 ──<b>2× DOME JOINTS</b>──1224m──► WTG-08.<br>
+  <b>Ring Arm 2 (bottom, field-verified by Freddie):</b> OEM ──(OPGW, dist TBC)──► WTG-09 ── WTG-11 ── WTG-13 ── WTG-15 ── WTG-17 ──2557m──► WTG-18 ──► WTG-16 ── WTG-14 ── WTG-12 ──► WTG-10.<br>
+  <b>Ring closes:</b> WTG-08 ──<b>2503m RING CLOSE ⚠</b>──► WTG-10. Bottom arm non-adjacent WTG spans: distances TBC (OTDR fibre length measurements required).<br>
+  <b>⚠ Cable break repair:</b> Manhole on WTG-08↔WTG-10 ring-close span. 24 cores fusion-spliced. Repair joint 1.155 dB — CTTX re-splice required.<br>
+  <b>⚠ Dome joints — WTG-07↔WTG-08 span:</b> 2× dome joints (48 splices). Dome budget ≤0.20 dB/core. Residual cable 0.582 dB/km — COMPLIANT. All 48 splices OTDR-tested during WTG-08 re-splice works.<br>
+  <b>⚠ Dome joints — WTG-08↔WTG-10 ring-close span:</b> 3× dome joints (1T×12F = 36 splices) — COMPLIANT (each ≤0.10 dB, through-splice events). SEPARATE: cable break repair joint = 1.155 dB (single splice, CTTX re-splice obligation ≤0.50 dB). Dome losses are independent of the repair joint — they do not add up to 1.155 dB. ACTION: Re-splice repair joint + OTDR all 36 dome splices, submit to SpecAfrica.<br>
+  <b>⚠ Dome joint — WTG-12↔WTG-10 span:</b> 1× dome joint (1T×12F = 12 splices). Budget ≤0.10 dB/core. 12 splices OTDR test required.<br>
+  <b>NODE colour = CTTX termination workmanship only.</b> All 18 nodes CTTX compliant. <b>Red CLIENT badges on spans</b> = client-supplied cable infrastructure observations — not CTTX workmanship failures.<br>
+  <b>272 RC→LC mid-coupler replacements</b> completed. Met Mast 1 → WTG-03 | Met Mast 2 → WTG-09 (field-verified; IFC shows WTG-10).
+</div>
+<div class="tooltip" id="tt"></div>
+<script>
+const NW=72,NH=58,STEP=102;
+const TOPR=100,BOTR=310;
+const OEM_X=10,OEM_Y=TOPR-20,OEM_W=82;
+const OEM_H=(BOTR+NH+20)-(TOPR-20);
+const OVHW=90,STARTX=OEM_X+OEM_W+OVHW;
+
+// STATUS: PASS=CTTX compliant | CTTX_ACTION=CTTX workmanship action | CLIENT_CABLE=client infrastructure obs (node OK)
+const COLOR={PASS:'#2e7d32',CTTX_ACTION:'#E65C00',CLIENT_CABLE:'#1255A0',OEM:'#0D2E5C'};
+const LIGHTBG={PASS:'#e8f5e9',CTTX_ACTION:'#FFF3CD',CLIENT_CABLE:'#E3F0FB',OEM:'#dce8f5'};
+const NS='http://www.w3.org/2000/svg';
+
+// TOP ARM: WTG-01 → WTG-08
+const TOP=[
+  {id:'WTG-01',lbl:'WTG 01',sub:'NODE: PASS',code:'CLIENT_CABLE',loss:'2.567',spl:'1.649',rmu:false,mm:false,clientSpan:true,
+   tip:'CTTX NODE: PASS — pending OVH re-splice on restored cable\nCLIENT CABLE OBS: OVH_14 overhead cable\n12.9 dB span loss — physical fault in\nclient-supplied/erected overhead cable\nClient action: investigate & repair OVH cable\nCTTX action: re-splice OVH_35/36/20 after repair\n36 cores | OPGW entry point'},
+  {id:'WTG-02',lbl:'WTG 02',sub:'NODE: PASS',code:'CLIENT_CABLE',loss:'3.861',spl:'0.179',rmu:false,mm:false,clientSpan:true,
+   tip:'CTTX NODE: PASS — connector 0.179 dB (well within budget)\nCLIENT CABLE OBS: span attenuation 3.861 dB/km\nPhysical fault in client-supplied buried cable\nClient action: investigate WTG-01↔WTG-02 span\n24 cores tested'},
+  {id:'WTG-03',lbl:'WTG 03',sub:'NODE: PASS',code:'CLIENT_CABLE',loss:'1.103',spl:'0.318',rmu:true,mm:true,clientSpan:true,
+   tip:'CTTX NODE: PASS — connector 0.318 dB (within budget)\nCLIENT CABLE OBS: 12/24 cores at 1.103 dB/km\nPhysical fault in client-supplied buried cable\nClient action: investigate WTG-02↔WTG-03 span\nRMU-03 branch | Met Mast 1 (Modbus-TCP)'},
+  {id:'WTG-04',lbl:'WTG 04',sub:'0.390 dB/km',code:'PASS',loss:'0.390',spl:'0.000',rmu:false,mm:false,
+   tip:'CTTX COMPLIANT ✓\nAttenuation 0.390 dB/km — well within threshold\nNo connector events\n24 cores tested'},
+  {id:'WTG-05',lbl:'WTG 05',sub:'0.599 dB/km',code:'PASS',loss:'0.599',spl:'0.000',rmu:true,mm:false,
+   tip:'CTTX COMPLIANT ✓\nAttenuation 0.599 dB/km — within threshold\nNo connector events\n24 cores | RMU-05 branch'},
+  {id:'WTG-06',lbl:'WTG 06',sub:'0.870 dB/km',code:'PASS',loss:'0.870',spl:'0.000',rmu:false,mm:false,
+   tip:'CTTX COMPLIANT ✓\nAttenuation 0.870 dB/km — within threshold\nNo connector events\n24 cores tested'},
+  {id:'WTG-07',lbl:'WTG 07',sub:'NODE: PASS',code:'CLIENT_CABLE',loss:'1.112',spl:'0.600',rmu:true,mm:false,clientSpan:true,
+   tip:'CTTX NODE: PASS — node 0.600 dB (within ≤1.20 dB budget)\nCLIENT CABLE OBS: 23/24 cores at 1.112 dB/km\nPhysical fault in client-supplied buried cable\nClient action: investigate WTG-06↔WTG-07 span\nRMU-07 branch\n──────────────────────────────\nOUTGOING SPAN NOTE (WTG-07→WTG-08):\n2× dome joint enclosures in span\n12-tube × 2-fibre = 24 splices per dome\n48 total splice points — testing req\'d'},
+  {id:'WTG-08',lbl:'WTG 08',sub:'0.746 dB/km',code:'PASS',loss:'0.746',spl:'0.000',rmu:false,mm:false,
+   tip:'CTTX COMPLIANT ✓\nNode: PASS — node insertion loss within budget\nCable span: 0.746 dB/km — within ≤1.00 dB/km threshold\n──────────────\nRING-CLOSE SPAN (WTG-08↔WTG-10, 2503m):\n3× dome joints in ring-close span — CTTX re-splice required\nDome splice reading: 1.155 dB (at ring-close dome joints)\nTarget: ≤0.10 dB per splice after re-splice\nSee ring-close DJ markers for full detail'},
+];
+
+// BOTTOM ARM: OEM(overhead)→WTG-09→WTG-11→WTG-13→WTG-15→WTG-17→WTG-18→WTG-16→WTG-14→WTG-12→WTG-10→(ring close)→WTG-08
+// Field-verified sequence by site technician (Freddie):
+// Even run out: WTG-08→WTG-10→WTG-12→WTG-14→WTG-16→WTG-18
+// Odd run back: WTG-18→WTG-17→WTG-15→WTG-13→WTG-11→WTG-09 (OEM overhead)
+const BOT=[
+  {id:'WTG-09',lbl:'WTG 09',sub:'NODE: PASS',code:'CLIENT_CABLE',loss:'1.021',spl:'0.703',rmu:false,mm:true,ovh:true,clientSpan:true,
+   tip:'CTTX NODE: PASS — node 0.703 dB (within ≤1.20 dB budget)\nOEM OVERHEAD ENTRY — Ring Arm 2\nCLIENT CABLE OBS: OVHL_48 overhead cable\n14.355 dB/km — physical fault in client-supplied\nOEM→WTG-09 OPGW overhead cable\nClient action: investigate & repair overhead cable\nOEM→WTG-09 OTDR run outstanding\nMet Mast 2 field-verified here (IFC shows WTG-10)\n36 cores tested'},
+  {id:'WTG-11',lbl:'WTG 11',sub:'0.701 dB/km',code:'PASS',loss:'0.701',spl:'0.330',rmu:true,mm:false,
+   tip:'CTTX COMPLIANT ✓\nAttenuation 0.701 dB/km — within threshold\nNode 0.330 dB — within budget\n24 cores | RMU-11 branch'},
+  {id:'WTG-13',lbl:'WTG 13',sub:'0.414 dB/km',code:'PASS',loss:'0.414',spl:'0.118',rmu:false,mm:false,
+   tip:'CTTX COMPLIANT ✓\nAttenuation 0.414 dB/km — well within threshold\nConnector 0.118 dB — excellent\n24 cores tested'},
+  {id:'WTG-15',lbl:'WTG 15',sub:'0.626 dB/km',code:'PASS',loss:'0.626',spl:'0.577',rmu:true,mm:false,
+   tip:'CTTX COMPLIANT ✓\nAttenuation 0.626 dB/km — within threshold\nNode 0.577 dB — within budget\n25 cores | RMU-15 branch'},
+  {id:'WTG-17',lbl:'WTG 17',sub:'NODE: PASS',code:'CLIENT_CABLE',loss:'1.783',spl:'0.584',rmu:true,mm:false,clientSpan:true,
+   tip:'CTTX NODE: PASS — node 0.584 dB (within ≤1.20 dB budget)\nCLIENT CABLE OBS: 15/24 cores at 1.783 dB/km\nPhysical fault in client-supplied buried cable\n(exceeds ≤1.00 dB/km G.652D burial threshold)\nClient action: investigate WTG-15↔WTG-17 span\nLocate and repair or replace affected cable section\nRMU-17 branch'},
+  {id:'WTG-18',lbl:'WTG 18',sub:'0.751 dB/km',code:'PASS',loss:'0.751',spl:'0.171',rmu:false,mm:false,
+   tip:'CTTX COMPLIANT ✓\nAttenuation 0.751 dB/km — within threshold\nNode 0.171 dB — well within budget\n24 cores tested'},
+  {id:'WTG-16',lbl:'WTG 16',sub:'0.583 dB/km',code:'PASS',loss:'0.583',spl:'0.664',rmu:true,mm:false,
+   tip:'CTTX COMPLIANT ✓\nAttenuation 0.583 dB/km — within threshold\nNode 0.664 dB — within budget\n25 cores | RMU-16 branch'},
+  {id:'WTG-14',lbl:'WTG 14',sub:'NODE: PASS',code:'CLIENT_CABLE',loss:'1.134',spl:'1.043',rmu:true,mm:false,clientSpan:true,
+   tip:'CTTX NODE: PASS — node 1.043 dB (within ≤1.20 dB budget)\nCLIENT CABLE OBS: 11/24 cores at 1.134 dB/km\nPhysical fault in client-supplied buried cable\nClient action: investigate WTG-16↔WTG-14 span\nRMU-14 branch'},
+  {id:'WTG-12',lbl:'WTG 12',sub:'0.624 dB/km',code:'PASS',loss:'0.624',spl:'0.586',rmu:true,mm:false,
+   tip:'CTTX COMPLIANT ✓\nAttenuation 0.624 dB/km — within threshold\nNode 0.586 dB — within budget\n24 cores | RMU-12 branch\n──────────────────────────────\nOUTGOING SPAN (WTG-12→WTG-10):\n1× dome joint (1T×12F = 12 splices)\nBudget: ≤0.10 dB/core'},
+  {id:'WTG-10',lbl:'WTG 10',sub:'NODE: PASS*',code:'CLIENT_CABLE',loss:'6.762',spl:'1.218',rmu:true,mm:false,
+   tip:'CTTX NODE: PASS* (* connector 1.218 dB — minor clean/replace)\nRING-CLOSE END — WTG-10↔WTG-08 (2503m)\nCLIENT CABLE OBS: RMU cable run fault\nAll 4 RMU cores catastrophic (max 6.762 dB/km)\nPhysical fault in client-supplied RMU cable\nClient action: locate & repair RMU cable run\nCTTX action: clean/replace patch lead (minor)\n──────────────────────────────\nRING-CLOSE SPAN DOME JOINTS:\n3× dome joints (1T×12F = 12 splices each = 36 total)\nBudget: ≤0.30 dB/core — not excessive\nCable break repair joint also in this span\n──────────────────────────────\nOUTGOING SPAN (WTG-10→WTG-12):\n1× dome joint — 12 splices — ≤0.10 dB/core\n28 cores tested'},
+];
+
+// Span distances — field-verified sequence (Freddie)
+// Only WTG-17↔WTG-18 = 2557m confirmed from IFC (these are adjacent in both IFC and actual route)
+// All other spans are non-adjacent in IFC — distances TBC from OTDR fibre length measurements
+const TOP_DIST=['','1824m','682m','1907m','2124m','548m','598m','1224m'];
+const BOT_DIST=['','TBC','TBC','TBC','TBC','2557m','TBC','TBC','TBC',''];
+
+function el(tag,attrs,...ch){
+  const e=document.createElementNS(NS,tag);
+  for(const[k,v] of Object.entries(attrs)) e.setAttribute(k,v);
+  for(const c of ch){ if(typeof c==='string') e.textContent=c; else e.appendChild(c); }
+  return e;
+}
+
+const topXs=TOP.map((_,i)=>STARTX+i*STEP);
+const botXs=BOT.map((_,i)=>STARTX+i*STEP);
+const bendXest=Math.max(topXs[TOP.length-1]+NW, botXs[BOT.length-1]+NW)+52;
+const svgW=Math.max(topXs[topXs.length-1],botXs[botXs.length-1])+NW+30, svgWfinal=Math.max(svgW, bendXest+130);
+const svgH=BOTR+NH+110;
+const svg=document.getElementById('mainsvg');
+svg.setAttribute('width',svgWfinal);
+svg.setAttribute('height',svgH);
+svg.setAttribute('viewBox',`0 0 ${svgWfinal} ${svgH}`);
+
+// Arrow markers
+const defs=el('defs',{});
+function mkArrow(id,col){
+  const m=el('marker',{id,markerWidth:'8',markerHeight:'6',refX:'7',refY:'3',orient:'auto'});
+  m.appendChild(el('polygon',{points:'0 0, 8 3, 0 6',fill:col}));
+  defs.appendChild(m);
+}
+mkArrow('arr','#1E4E79');
+mkArrow('ring','#e65100');
+svg.appendChild(defs);
+
+// OEM Building
+const OEM_BOX_H=(BOTR+NH+20)-(TOPR-20);
+svg.appendChild(el('rect',{x:OEM_X,y:OEM_Y,width:OEM_W,height:OEM_BOX_H,fill:'#0D2E5C',rx:7}));
+['OEM','BLDG','SCADA'].forEach((t,i)=>{
+  const dy=OEM_BOX_H*0.25+i*22;
+  const fs=i===0?11:9;
+  const tt=el('text',{x:OEM_X+OEM_W/2,y:OEM_Y+dy,'font-size':fs,'font-family':'Arial','text-anchor':'middle',fill:'#fff','font-weight':i===0?'bold':'normal'});
+  tt.textContent=t; svg.appendChild(tt);
+});
+
+// Overhead sections
+function drawOvh(rowY,label,clientFault=false){
+  const x1=OEM_X+OEM_W,x2=STARTX,cy=rowY+NH/2;
+  svg.appendChild(el('line',{x1,y1:cy,x2,y2:cy,stroke:'#1E4E79','stroke-width':2.5,'stroke-dasharray':'7,4','marker-end':'url(#arr)',opacity:'0.85'}));
+  const tx=x1+OVHW*0.5;
+  svg.appendChild(el('line',{x1:tx-7,y1:cy+12,x2:tx+7,y2:cy+12,stroke:'#546e7a','stroke-width':2}));
+  svg.appendChild(el('line',{x1:tx,y1:cy+12,x2:tx,y2:cy-10,stroke:'#546e7a','stroke-width':2}));
+  svg.appendChild(el('line',{x1:tx-5,y1:cy-2,x2:tx+5,y2:cy-2,stroke:'#546e7a','stroke-width':1.5}));
+  svg.appendChild(el('rect',{x:x1+3,y:cy-22,width:OVHW-6,height:18,fill:'#e3eaf5',rx:3,opacity:'.9'}));
+  svg.appendChild(el('text',{x:(x1+x2)/2,y:cy-9,'font-size':8,'font-family':'Arial','text-anchor':'middle',fill:'#1E4E79','font-weight':'bold'},label));
+  if(clientFault){
+    const fmx=(x1+x2)/2;
+    svg.appendChild(el('line',{x1:x1+8,y1:cy,x2:x2-8,y2:cy,stroke:'#c0392b','stroke-width':2,'stroke-dasharray':'4,2',opacity:'0.7'}));
+    svg.appendChild(el('rect',{x:fmx-14,y:cy+4,width:28,height:12,fill:'#c0392b',rx:3,opacity:'0.88'}));
+    svg.appendChild(el('text',{x:fmx,y:cy+14,'font-size':6.5,'font-family':'Arial','text-anchor':'middle',fill:'#fff','font-weight':'bold'},'CLIENT'));
+  }
+}
+drawOvh(TOPR,'1367m+157m FO',true);
+// Bottom arm: OEM→WTG-09 OPGW overhead (Ring Arm 2 entry) — field-verified
+drawOvh(BOTR,'OPGW (dist TBC)',true);
+
+// Span cable
+function drawSpan(x1,rowY,x2,label,clientFault=false){
+  const cy=rowY+NH/2;
+  svg.appendChild(el('line',{x1,y1:cy,x2,y2:cy,stroke:'#1E4E79','stroke-width':2.5,'marker-end':'url(#arr)',opacity:'0.8'}));
+  const mx=(x1+x2)/2;
+  const lblY=rowY===TOPR?cy-NH*0.55:cy+NH*0.55+4;
+  svg.appendChild(el('rect',{x:mx-28,y:lblY-10,width:56,height:14,fill:'#f0f4fa',rx:3,opacity:'.92'}));
+  svg.appendChild(el('text',{x:mx,y:lblY,'font-size':8.5,'font-family':'Arial','text-anchor':'middle',fill:'#1E4E79','font-weight':'bold'},label));
+  if(clientFault){
+    svg.appendChild(el('line',{x1:x1+(x2-x1)*0.28,y1:cy,x2:x1+(x2-x1)*0.72,y2:cy,stroke:'#c0392b','stroke-width':2.5,'stroke-dasharray':'5,3',opacity:'0.75'}));
+    const badgeY=rowY===TOPR?cy+6:cy-18;
+    svg.appendChild(el('rect',{x:mx-15,y:badgeY,width:30,height:13,fill:'#c0392b',rx:3,opacity:'0.88'}));
+    svg.appendChild(el('text',{x:mx,y:badgeY+9.5,'font-size':6.5,'font-family':'Arial','text-anchor':'middle',fill:'#fff','font-weight':'bold'},'CLIENT'));
+  }
+}
+
+// Draw top arm spans
+for(let i=0;i<TOP.length-1;i++)
+  drawSpan(topXs[i]+NW,TOPR,topXs[i+1],TOP_DIST[i+1],!!(TOP[i+1]&&TOP[i+1].clientSpan));
+// Draw bottom arm spans
+for(let i=0;i<BOT.length-1;i++)
+  drawSpan(botXs[i]+NW,BOTR,botXs[i+1],BOT_DIST[i+1],!!(BOT[i+1]&&BOT[i+1].clientSpan));
+
+// Ring-close span (WTG-08 to WTG-10) — field-verified by site technician
+// Contains: 3× dome joints + cable break repair joint (manhole)
+const t08rx=topXs[7]+NW, b09rx=botXs[9]; // botXs[9] = WTG-10 (ring-close end of bottom arm)
+const cy1=TOPR+NH/2, cy2=BOTR+NH/2;
+const bendX=Math.max(t08rx,b09rx)+52;
+const ringD=`M${t08rx},${cy1} H${bendX} V${cy2} H${b09rx}`;
+svg.appendChild(el('path',{d:ringD,fill:'none',stroke:'#e65100','stroke-width':3.5,'stroke-dasharray':'10,5','marker-end':'url(#ring)',opacity:'0.95'}));
+// Distance label
+const midY=(cy1+cy2)/2;
+svg.appendChild(el('rect',{x:bendX+4,y:midY-18,width:80,height:24,fill:'#fff3e0',stroke:'#e65100','stroke-width':1,rx:3}));
+svg.appendChild(el('text',{x:bendX+44,y:midY-6,'font-size':7.5,'font-family':'Arial','text-anchor':'middle',fill:'#bf360c','font-weight':'bold'},'08↔10 RING CLOSE'));
+svg.appendChild(el('text',{x:bendX+44,y:midY+6,'font-size':8,'font-family':'Arial','text-anchor':'middle',fill:'#bf360c','font-weight':'bold'},'2503m'));
+
+// 3× dome joint markers along ring-close vertical section
+const domeRCTip='CTTX ACTION — DOME JOINT RE-SPLICE REQUIRED\nWTG-08↔WTG-10 ring-close span (2503m)\n──────────────\n3× dome joint enclosures (field-verified, Freddie)\nEach dome: 1 tube × 12 fibres = 12 splices per dome\nTotal: 36 splice points\n──────────────\nSPLICE READING: 1.155 dB at ring-close dome joints\nThis loss is at the dome joint splices — NOT at WTG-08 node\nWTG-08 node insertion loss: PASS ✓\n──────────────\nRE-SPLICE REQUIRED:\nTarget: ≤0.10 dB per splice per dome (IEC 61300-3-34 Grade B)\nRe-splice affected dome joint cores to bring within spec\n──────────────\nACTION: Re-splice dome joints + OTDR all 36 splices\nSubmit all results to SpecAfrica';
+[0.25,0.52,0.78].forEach(frac=>{
+  const dmy=cy1+(cy2-cy1)*frac;
+  const dmx=bendX;
+  const dd=8;
+  const dg=el('g',{cursor:'pointer'});
+  dg.appendChild(el('polygon',{points:`${dmx},${dmy-dd} ${dmx+dd},${dmy} ${dmx},${dmy+dd} ${dmx-dd},${dmy}`,fill:'#e65100',stroke:'#fff','stroke-width':1.5,opacity:'0.95'}));
+  dg.appendChild(el('text',{x:dmx,y:dmy+3,'font-size':6,'font-family':'Arial','text-anchor':'middle',fill:'#fff','font-weight':'bold'},'DJ'));
+  dg.addEventListener('mouseenter',ev=>{
+    const tt=document.getElementById('tt');
+    tt.textContent=domeRCTip; tt.style.display='block'; moveTip(ev);
+  });
+  dg.addEventListener('mousemove',moveTip);
+  dg.addEventListener('mouseleave',()=>{ document.getElementById('tt').style.display='none'; });
+  svg.appendChild(dg);
+});
+// 3× dome joint label on vertical section
+svg.appendChild(el('rect',{x:bendX+14,y:cy1+(cy2-cy1)*0.08-8,width:62,height:16,fill:'#37474f',stroke:'#546e7a','stroke-width':1,rx:3,opacity:'0.92'}));
+svg.appendChild(el('text',{x:bendX+45,y:cy1+(cy2-cy1)*0.08+5,'font-size':7,'font-family':'Arial','text-anchor':'middle',fill:'#fff','font-weight':'bold'},'3× DOME JNT ⚠'));
+
+// Re-splice action note — positioned clear of RING CLOSE label
+const respliceNoteY=cy1+(cy2-cy1)*0.88;
+svg.appendChild(el('rect',{x:bendX+14,y:respliceNoteY-10,width:90,height:22,fill:'#e65100',stroke:'#fff','stroke-width':1,rx:4,opacity:'0.92'}));
+svg.appendChild(el('text',{x:bendX+59,y:respliceNoteY+1,'font-size':7,'font-family':'Arial','text-anchor':'middle',fill:'#fff','font-weight':'bold'},"CTTX: DOME RESPLICE REQ'D"));
+svg.appendChild(el('text',{x:bendX+59,y:respliceNoteY+11,'font-size':6.5,'font-family':'Arial','text-anchor':'middle',fill:'#fff'},'1.155 dB at dome jnts → ≤0.10 dB'));
+
+// Manhole marker between WTG-07 and WTG-08 — 2× dome joints (field-verified, Freddie)
+(function(){
+  const i6=6;
+  const mx=topXs[i6]+NW+(topXs[i6+1]-topXs[i6]-NW)*0.55;
+  const cy=TOPR+NH/2;
+  const d=9;
+  const dg=el('g',{cursor:'pointer'});
+  dg.appendChild(el('polygon',{points:`${mx},${cy-d} ${mx+d},${cy} ${mx},${cy+d} ${mx-d},${cy}`,fill:'#546e7a',stroke:'#fff','stroke-width':1.5,opacity:'0.9'}));
+  dg.appendChild(el('text',{x:mx,y:cy+3.5,'font-size':7,'font-family':'Arial','text-anchor':'middle',fill:'#fff','font-weight':'bold'},'MH'));
+  // Dome joint warning badge above
+  dg.appendChild(el('rect',{x:mx-28,y:cy-d-22,width:56,height:16,fill:'#37474f',stroke:'#546e7a','stroke-width':1,rx:3,opacity:'0.92'}));
+  dg.appendChild(el('text',{x:mx,y:cy-d-11,'font-size':7,'font-family':'Arial','text-anchor':'middle',fill:'#fff','font-weight':'bold'},'2\xd7 DOME JNT'));
+  const domeTip='DOME JOINTS — WTG-07↔WTG-08 span (1224m)\n──────────────\n2\xd7 dome joint enclosures (field-verified)\nEach dome: 12-tube \xd7 2-fibre = 24 splices\nTotal: 48 individual splice points\nCriteria: ≤0.10 dB per splice (IEC 61300-3-34 Grade B)\nEach dome ≤0.10 dB per core (worst splice)\n──────────────\nLOSS BUDGET IMPACT:\nDome allowance: 2 \xd7 ≤0.10 dB = ≤0.20 dB/core\nApparent span: 0.746 dB/km \xd7 1.224 km = 0.913 dB\nLess dome: 0.913 − 0.20 = 0.713 dB cable-only\nResidual: 0.713 / 1.224 = 0.582 dB/km ✓ COMPLIANT\n──────────────\nACTION: 48 dome splices OTDR-test mandatory\nDuring WTG-08 re-splice site visit\nAll results to be submitted to SpecAfrica';
+  dg.addEventListener('mouseenter',ev=>{
+    const tt=document.getElementById('tt');
+    tt.textContent=domeTip; tt.style.display='block'; moveTip(ev);
+  });
+  dg.addEventListener('mousemove',moveTip);
+  dg.addEventListener('mouseleave',()=>{ document.getElementById('tt').style.display='none'; });
+  svg.appendChild(dg);
+})();
+
+// Manhole marker between WTG-02 and WTG-03 (field-verified, Freddie)
+(function(){
+  const i1=1;
+  const mx=topXs[i1]+NW+(topXs[i1+1]-topXs[i1]-NW)*0.50;
+  const cy=TOPR+NH/2;
+  const d=9;
+  svg.appendChild(el('polygon',{points:`${mx},${cy-d} ${mx+d},${cy} ${mx},${cy+d} ${mx-d},${cy}`,fill:'#546e7a',stroke:'#fff','stroke-width':1.5,opacity:'0.9'}));
+  svg.appendChild(el('text',{x:mx,y:cy+3.5,'font-size':7,'font-family':'Arial','text-anchor':'middle',fill:'#fff','font-weight':'bold'},'MH'));
+  svg.appendChild(el('text',{x:mx,y:cy-d-4,'font-size':7.5,'font-family':'Arial','text-anchor':'middle',fill:'#546e7a','font-style':'italic'},'Manhole'));
+})();
+
+// Dome joint marker — WTG-12↔WTG-10 span (bottom arm, field-verified)
+(function(){
+  const i8=8;
+  const mx=botXs[i8]+NW+(botXs[i8+1]-botXs[i8]-NW)*0.50;
+  const cy=BOTR+NH/2;
+  const dd=9;
+  const dg=el('g',{cursor:'pointer'});
+  dg.appendChild(el('polygon',{points:`${mx},${cy-dd} ${mx+dd},${cy} ${mx},${cy+dd} ${mx-dd},${cy}`,fill:'#37474f',stroke:'#fff','stroke-width':1.5,opacity:'0.9'}));
+  dg.appendChild(el('text',{x:mx,y:cy+3.5,'font-size':6,'font-family':'Arial','text-anchor':'middle',fill:'#fff','font-weight':'bold'},'DJ'));
+  dg.appendChild(el('rect',{x:mx-24,y:cy-dd-20,width:48,height:14,fill:'#37474f',stroke:'#546e7a','stroke-width':1,rx:3,opacity:'0.92'}));
+  dg.appendChild(el('text',{x:mx,y:cy-dd-9,'font-size':6.5,'font-family':'Arial','text-anchor':'middle',fill:'#fff','font-weight':'bold'},'DOME JNT'));
+  const domeTip12='DOME JOINT — WTG-12↔WTG-10 span\n──────────────\n1\xd7 dome joint enclosure (field-verified, Freddie)\n1 tube \xd7 12 fibres = 12 individual splices\nCriteria: ≤0.10 dB per splice (IEC 61300-3-34 Grade B)\nBudget: ≤0.10 dB per core\nACTION: All 12 splices OTDR-tested\nResults submitted to SpecAfrica';
+  dg.addEventListener('mouseenter',ev=>{
+    const tt=document.getElementById('tt');
+    tt.textContent=domeTip12; tt.style.display='block'; moveTip(ev);
+  });
+  dg.addEventListener('mousemove',moveTip);
+  dg.addEventListener('mouseleave',()=>{ document.getElementById('tt').style.display='none'; });
+  svg.appendChild(dg);
+})();
+
+// Dome joint marker — WTG-16↔WTG-14 span (bottom arm, RMU area, 24 splices)
+(function(){
+  const iA=6;
+  const mx=botXs[iA]+NW+(botXs[iA+1]-botXs[iA]-NW)*0.50;
+  const cy=BOTR+NH/2;
+  const dd=9;
+  const dg=el('g',{cursor:'pointer'});
+  dg.appendChild(el('polygon',{points:`${mx},${cy-dd} ${mx+dd},${cy} ${mx},${cy+dd} ${mx-dd},${cy}`,fill:'#37474f',stroke:'#fff','stroke-width':1.5,opacity:'0.9'}));
+  dg.appendChild(el('text',{x:mx,y:cy+3.5,'font-size':6,'font-family':'Arial','text-anchor':'middle',fill:'#fff','font-weight':'bold'},'DJ'));
+  dg.appendChild(el('rect',{x:mx-24,y:cy-dd-20,width:48,height:14,fill:'#37474f',stroke:'#546e7a','stroke-width':1,rx:3,opacity:'0.92'}));
+  dg.appendChild(el('text',{x:mx,y:cy-dd-9,'font-size':6.5,'font-family':'Arial','text-anchor':'middle',fill:'#fff','font-weight':'bold'},'DOME JNT'));
+  const tip16='DOME JOINT — WTG-16↔WTG-14 span (RMU area)\n──────────────\n1\xd7 dome joint enclosure (field-verified, Freddie)\n24 individual splices\nCriteria: ≤0.10 dB per splice (IEC 61300-3-34 Grade B)\nBudget: ≤0.10 dB per core\nACTION: All 24 splices OTDR-tested\nResults submitted to SpecAfrica';
+  dg.addEventListener('mouseenter',ev=>{
+    const tt=document.getElementById('tt');
+    tt.textContent=tip16; tt.style.display='block'; moveTip(ev);
+  });
+  dg.addEventListener('mousemove',moveTip);
+  dg.addEventListener('mouseleave',()=>{ document.getElementById('tt').style.display='none'; });
+  svg.appendChild(dg);
+})();
+
+// Dome joint marker — WTG-14↔WTG-12 span (bottom arm, RMU area, 24 splices)
+(function(){
+  const iB=7;
+  const mx=botXs[iB]+NW+(botXs[iB+1]-botXs[iB]-NW)*0.50;
+  const cy=BOTR+NH/2;
+  const dd=9;
+  const dg=el('g',{cursor:'pointer'});
+  dg.appendChild(el('polygon',{points:`${mx},${cy-dd} ${mx+dd},${cy} ${mx},${cy+dd} ${mx-dd},${cy}`,fill:'#37474f',stroke:'#fff','stroke-width':1.5,opacity:'0.9'}));
+  dg.appendChild(el('text',{x:mx,y:cy+3.5,'font-size':6,'font-family':'Arial','text-anchor':'middle',fill:'#fff','font-weight':'bold'},'DJ'));
+  dg.appendChild(el('rect',{x:mx-24,y:cy-dd-20,width:48,height:14,fill:'#37474f',stroke:'#546e7a','stroke-width':1,rx:3,opacity:'0.92'}));
+  dg.appendChild(el('text',{x:mx,y:cy-dd-9,'font-size':6.5,'font-family':'Arial','text-anchor':'middle',fill:'#fff','font-weight':'bold'},'DOME JNT'));
+  const tip14='DOME JOINT — WTG-14↔WTG-12 span (RMU area)\n──────────────\n1\xd7 dome joint enclosure (field-verified, Freddie)\n24 individual splices\nCriteria: ≤0.10 dB per splice (IEC 61300-3-34 Grade B)\nBudget: ≤0.10 dB per core\nACTION: All 24 splices OTDR-tested\nResults submitted to SpecAfrica';
+  dg.addEventListener('mouseenter',ev=>{
+    const tt=document.getElementById('tt');
+    tt.textContent=tip14; tt.style.display='block'; moveTip(ev);
+  });
+  dg.addEventListener('mousemove',moveTip);
+  dg.addEventListener('mouseleave',()=>{ document.getElementById('tt').style.display='none'; });
+  svg.appendChild(dg);
+})();
+
+// Manhole + dome joint — WTG-17↔WTG-18 span (2557m, field-verified, 12 splices)
+(function(){
+  const i4=4;
+  const mx=botXs[i4]+NW+(botXs[i4+1]-botXs[i4]-NW)*0.50;
+  const cy=BOTR+NH/2;
+  const d=9;
+  const dg=el('g',{cursor:'pointer'});
+  // Manhole diamond
+  dg.appendChild(el('polygon',{points:`${mx},${cy-d} ${mx+d},${cy} ${mx},${cy+d} ${mx-d},${cy}`,fill:'#546e7a',stroke:'#fff','stroke-width':1.5,opacity:'0.9'}));
+  dg.appendChild(el('text',{x:mx,y:cy+3.5,'font-size':7,'font-family':'Arial','text-anchor':'middle',fill:'#fff','font-weight':'bold'},'MH'));
+  // Dome badge above
+  dg.appendChild(el('rect',{x:mx-28,y:cy-d-22,width:56,height:14,fill:'#37474f',stroke:'#546e7a','stroke-width':1,rx:3,opacity:'0.92'}));
+  dg.appendChild(el('text',{x:mx,y:cy-d-11,'font-size':6.5,'font-family':'Arial','text-anchor':'middle',fill:'#fff','font-weight':'bold'},'MH + DOME JNT'));
+  const tip1718='MANHOLE + DOME JOINT — WTG-17↔WTG-18 span (2557m)\n──────────────\nManhole enclosure with 1\xd7 dome joint (field-verified, Freddie)\n12 individual splices\nCriteria: ≤0.10 dB per splice (IEC 61300-3-34 Grade B)\nBudget: ≤0.10 dB per core\nACTION: All 12 splices OTDR-tested\nResults submitted to SpecAfrica';
+  dg.addEventListener('mouseenter',ev=>{
+    const tt=document.getElementById('tt');
+    tt.textContent=tip1718; tt.style.display='block'; moveTip(ev);
+  });
+  dg.addEventListener('mousemove',moveTip);
+  dg.addEventListener('mouseleave',()=>{ document.getElementById('tt').style.display='none'; });
+  svg.appendChild(dg);
+})();
+
+// Dome joint in RMU — WTG-11↔WTG-13 span (field-verified, 12 splices)
+(function(){
+  const i1=1;
+  const mx=botXs[i1]+NW+(botXs[i1+1]-botXs[i1]-NW)*0.50;
+  const cy=BOTR+NH/2;
+  const dd=9;
+  const dg=el('g',{cursor:'pointer'});
+  dg.appendChild(el('polygon',{points:`${mx},${cy-dd} ${mx+dd},${cy} ${mx},${cy+dd} ${mx-dd},${cy}`,fill:'#37474f',stroke:'#fff','stroke-width':1.5,opacity:'0.9'}));
+  dg.appendChild(el('text',{x:mx,y:cy+3.5,'font-size':6,'font-family':'Arial','text-anchor':'middle',fill:'#fff','font-weight':'bold'},'DJ'));
+  dg.appendChild(el('rect',{x:mx-24,y:cy-dd-20,width:48,height:14,fill:'#37474f',stroke:'#546e7a','stroke-width':1,rx:3,opacity:'0.92'}));
+  dg.appendChild(el('text',{x:mx,y:cy-dd-9,'font-size':6.5,'font-family':'Arial','text-anchor':'middle',fill:'#fff','font-weight':'bold'},'DOME JNT'));
+  const tip1113='DOME JOINT — WTG-11↔WTG-13 span (RMU enclosure)\n──────────────\n1\xd7 dome joint in RMU (field-verified, Freddie)\n12 individual splices\nCriteria: ≤0.10 dB per splice (IEC 61300-3-34 Grade B)\nBudget: ≤0.10 dB per core\nACTION: All 12 splices OTDR-tested\nResults submitted to SpecAfrica';
+  dg.addEventListener('mouseenter',ev=>{
+    const tt=document.getElementById('tt');
+    tt.textContent=tip1113; tt.style.display='block'; moveTip(ev);
+  });
+  dg.addEventListener('mousemove',moveTip);
+  dg.addEventListener('mouseleave',()=>{ document.getElementById('tt').style.display='none'; });
+  svg.appendChild(dg);
+})();
+
+// Draw nodes
+function drawNode(n,x,y,isBot){
+  const col=COLOR[n.code]||'#888';
+  const bg=LIGHTBG[n.code]||'#eee';
+  const g=el('g',{cursor:'pointer'});
+  g.appendChild(el('rect',{x:x+2,y:y+2,width:NW,height:NH,fill:'rgba(0,0,0,0.08)',rx:6}));
+  g.appendChild(el('rect',{x,y,width:NW,height:NH,fill:bg,stroke:col,'stroke-width':2.2,rx:6}));
+  g.appendChild(el('rect',{x,y,width:NW,height:15,fill:col,rx:6}));
+  g.appendChild(el('rect',{x,y:y+9,width:NW,height:6,fill:col}));
+  g.appendChild(el('text',{x:x+NW/2,y:y+12,'font-size':10,'font-family':'Arial','text-anchor':'middle',fill:'#fff','font-weight':'bold'},n.lbl));
+  const lc=n.code==='CTTX_ACTION'?'#7B4F00':'#1b5e20';
+  g.appendChild(el('text',{x:x+NW/2,y:y+29,'font-size':8,'font-family':'Arial','text-anchor':'middle',fill:lc,'font-weight':'bold'},n.sub));
+  const sc=parseFloat(n.spl)>1.20?'#b71c1c':parseFloat(n.spl)>0.80?'#e65100':'#555';
+  g.appendChild(el('text',{x:x+NW/2,y:y+40,'font-size':7.5,'font-family':'Arial','text-anchor':'middle',fill:sc},n.spl==='0.000'?'node: —':'node: '+n.spl+' dB'));
+  const chipT={PASS:'CTTX PASS ✓',CTTX_ACTION:'RESPLICE',CLIENT_CABLE:'CLIENT OBS'}[n.code]||n.code;
+  g.appendChild(el('rect',{x:x+4,y:y+44,width:NW-8,height:12,fill:col,rx:3}));
+  g.appendChild(el('text',{x:x+NW/2,y:y+53.5,'font-size':7,'font-family':'Arial','text-anchor':'middle',fill:'#fff','font-weight':'bold'},chipT));
+  if(n.ovh){
+    g.appendChild(el('rect',{x:x+1,y:y+1,width:NW-2,height:NH-2,fill:'none',stroke:'#e65100','stroke-width':1.5,'stroke-dasharray':'4,3',rx:5,opacity:'0.7'}));
+    g.appendChild(el('rect',{x:x+NW-24,y:y+NH-13,width:22,height:11,fill:'#e65100',rx:2}));
+    g.appendChild(el('text',{x:x+NW-13,y:y+NH-4,'font-size':7,'font-family':'Arial','text-anchor':'middle',fill:'#fff','font-weight':'bold'},'OVH'));
+  }
+  svg.appendChild(g);
+  if(n.rmu){
+    const cx=x+NW/2,bY=isBot?y+NH+22:y-22;
+    svg.appendChild(el('line',{x1:cx,y1:isBot?y+NH:y,x2:cx,y2:bY,stroke:'#546e7a','stroke-width':1.5,'stroke-dasharray':'4,3'}));
+    svg.appendChild(el('circle',{cx,cy:bY,r:8,fill:'#546e7a',opacity:'.9'}));
+    svg.appendChild(el('text',{x:cx,y:bY+3.5,'font-size':7,'font-family':'Arial','text-anchor':'middle',fill:'#fff','font-weight':'bold'},'RMU'));
+  }
+  if(n.mm){
+    const mmx=x+NW/2+(n.rmu?18:0);
+    const mBaseY=isBot?y+NH+40:y-40;
+    const mStemY=isBot?y+NH+(n.rmu?20:2):y-(n.rmu?20:2);
+    svg.appendChild(el('line',{x1:mmx,y1:mStemY,x2:mmx,y2:mBaseY,stroke:'#00796b','stroke-width':1.5,'stroke-dasharray':'3,3'}));
+    svg.appendChild(el('polygon',{points:`${mmx},${mBaseY-13} ${mmx-7},${mBaseY+3} ${mmx+7},${mBaseY+3}`,fill:'#00796b',opacity:'.9'}));
+    svg.appendChild(el('text',{x:mmx,y:mBaseY-2,'font-size':7,'font-family':'Arial','text-anchor':'middle',fill:'#fff','font-weight':'bold'},'MM'));
+  }
+  g.addEventListener('mouseenter',ev=>{
+    const tt=document.getElementById('tt');
+    tt.textContent=n.id+'\n'+'─'.repeat(26)+'\n'+n.tip;
+    tt.style.display='block'; moveTip(ev);
+  });
+  g.addEventListener('mousemove',moveTip);
+  g.addEventListener('mouseleave',()=>{ document.getElementById('tt').style.display='none'; });
+}
+
+TOP.forEach((n,i)=>drawNode(n,topXs[i],TOPR,false));
+BOT.forEach((n,i)=>drawNode(n,botXs[i],BOTR,true));
+
+// Arm labels
+svg.appendChild(el('text',{x:STARTX,y:TOPR-48,'font-size':10,'font-family':'Arial',fill:'#1E4E79','font-style':'italic'},'Ring Arm 1 — OEM → WTG-01 → … → WTG-08'));
+svg.appendChild(el('text',{x:STARTX,y:TOPR-35,'font-size':8.5,'font-family':'Arial',fill:'#546e7a'},'Top arm (left to right)'));
+svg.appendChild(el('text',{x:STARTX,y:BOTR+NH+52,'font-size':10,'font-family':'Arial',fill:'#1E4E79','font-style':'italic'},'Ring Arm 2 — OEM(OPGW) → WTG-09 → WTG-11 → … → WTG-18 → WTG-16 → … → WTG-10 → (ring close WTG-08)'));
+svg.appendChild(el('text',{x:STARTX,y:BOTR+NH+65,'font-size':8.5,'font-family':'Arial',fill:'#546e7a'},'Bottom arm — field-verified sequence (Freddie). Span distances TBC except WTG-17↔WTG-18 = 2557m.'));
+
+// OEM label
+svg.appendChild(el('text',{x:OEM_X,y:OEM_Y-8,'font-size':9,'font-family':'Arial',fill:'#546e7a','font-style':'italic'},'OEM Building'));
+
+// CTTX scope note
+svg.appendChild(el('rect',{x:OEM_X,y:OEM_Y+OEM_BOX_H+6,width:OEM_W+OVHW-4,height:34,fill:'#E3F0FB',stroke:'#1255A0','stroke-width':1,rx:4,opacity:'0.9'}));
+svg.appendChild(el('text',{x:OEM_X+4,y:OEM_Y+OEM_BOX_H+18,'font-size':7,'font-family':'Arial',fill:'#1255A0','font-weight':'bold'},'CTTX scope:'));
+svg.appendChild(el('text',{x:OEM_X+4,y:OEM_Y+OEM_BOX_H+28,'font-size':7,'font-family':'Arial',fill:'#1255A0'},'Terminations only'));
+svg.appendChild(el('text',{x:OEM_X+4,y:OEM_Y+OEM_BOX_H+38,'font-size':7,'font-family':'Arial',fill:'#1255A0'},'(splices + connectors)'));
+
+// Footer
+svg.appendChild(el('text',{x:svgW-10,y:svgH-6,'font-size':8,'font-family':'Arial','text-anchor':'end',fill:'#999','font-style':'italic'},'CTTX Services | CTTX-OYA-OTDR-2026-01 | 23 June 2026 | ZA-OYA0-EN-EL-CC-9526 Rev 7'));
+
+function moveTip(ev){
+  const tt=document.getElementById('tt');
+  const vw=window.innerWidth,vh=window.innerHeight;
+  let lx=ev.clientX+14,ly=ev.clientY+14;
+  if(lx+280>vw) lx=ev.clientX-294;
+  if(ly+200>vh) ly=ev.clientY-210;
+  tt.style.left=lx+'px'; tt.style.top=ly+'px';
+}
+</script>
+</body>
+</html>
