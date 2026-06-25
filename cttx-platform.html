@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CTTX Smart Engineering Platform</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#08111f;--surface:#0d1e35;--surface2:#0e2340;--border:#1a3a5c;
+  --text:#d0e4f4;--muted:#5a8ab0;--bright:#e8f4ff;
+  --blue:#1a6bbf;--cyan:#00c6ff;--green:#2ecc71;--amber:#f39c12;
+  --red:#e74c3c;--purple:#9b59b6;--teal:#1abc9c;
+}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+input,select,textarea,button{font-family:inherit;}
+
+/* ── TOPBAR ── */
+.topbar{display:flex;align-items:center;justify-content:space-between;background:#071428;padding:0 20px;height:52px;border-bottom:2px solid var(--border);position:sticky;top:0;z-index:200;}
+.tb-left{display:flex;align-items:center;gap:12px;}
+.logo{width:36px;height:36px;background:linear-gradient(135deg,var(--blue),var(--cyan));border-radius:8px;display:grid;place-items:center;font-weight:900;font-size:13px;color:#fff;flex-shrink:0;}
+.tb-title{font-size:15px;font-weight:800;color:#fff;letter-spacing:0.3px;}
+.tb-sub{font-size:10px;color:var(--muted);margin-top:1px;}
+.tb-right{display:flex;align-items:center;gap:12px;font-size:11px;}
+.pill{background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:4px 11px;display:flex;align-items:center;gap:5px;color:var(--muted);}
+.dot{width:7px;height:7px;border-radius:50%;}
+.dot-g{background:var(--green);box-shadow:0 0 5px var(--green);}
+.dot-a{background:var(--amber);box-shadow:0 0 5px var(--amber);}
+.dot-r{background:var(--red);box-shadow:0 0 5px var(--red);}
+#clock{font-size:13px;font-weight:700;color:#a0c8e8;font-variant-numeric:tabular-nums;}
+#proj-select{background:var(--surface2);border:1px solid var(--blue);border-radius:6px;color:var(--cyan);padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;outline:none;}
+
+/* ── NAV ── */
+.nav{background:#060f1c;border-bottom:1px solid var(--border);display:flex;overflow-x:auto;scrollbar-width:none;}
+.nav::-webkit-scrollbar{display:none;}
+.ntab{padding:13px 18px;font-size:11.5px;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;transition:all .18s;letter-spacing:0.4px;display:flex;align-items:center;gap:6px;user-select:none;}
+.ntab:hover{color:#90c0e0;background:rgba(255,255,255,.03);}
+.ntab.active{color:var(--cyan);border-bottom-color:var(--cyan);background:rgba(0,198,255,.05);}
+.ntab .ni{font-size:14px;}
+
+/* ── PANELS ── */
+.panel{display:none;padding:18px 20px;animation:fi .18s ease;}
+.panel.active{display:block;}
+@keyframes fi{from{opacity:0;transform:translateY(3px);}to{opacity:1;transform:translateY(0);}}
+
+/* ── GRID ── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+@media(max-width:960px){.g3,.g4{grid-template-columns:1fr 1fr;}}
+@media(max-width:640px){.g2,.g3,.g4{grid-template-columns:1fr;}}
+
+/* ── CARD ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 18px;}
+.card-h{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+
+/* ── KPI ── */
+.kpi{background:linear-gradient(135deg,var(--surface),var(--bg));border:1px solid var(--border);border-radius:10px;padding:16px 18px;position:relative;overflow:hidden;}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.kc-blue::before{background:linear-gradient(90deg,var(--blue),var(--cyan));}
+.kc-green::before{background:linear-gradient(90deg,#1a7a4a,var(--green));}
+.kc-amber::before{background:linear-gradient(90deg,#7a4a00,var(--amber));}
+.kc-red::before{background:linear-gradient(90deg,#6a1010,var(--red));}
+.kc-purple::before{background:linear-gradient(90deg,#4a1a7a,var(--purple));}
+.kc-teal::before{background:linear-gradient(90deg,#0a5a48,var(--teal));}
+.kpi-lbl{font-size:9.5px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:7px;}
+.kpi-val{font-size:26px;font-weight:900;color:var(--bright);line-height:1;}
+.kpi-sub{font-size:10.5px;color:#4a7a9a;margin-top:5px;}
+.kpi-ico{position:absolute;top:12px;right:14px;font-size:22px;opacity:0.25;}
+
+/* ── TABLE ── */
+.tbl{width:100%;border-collapse:collapse;font-size:11.5px;}
+.tbl th{text-align:left;padding:7px 9px;font-size:9.5px;font-weight:700;color:#3a6a8a;text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid var(--border);}
+.tbl td{padding:8px 9px;border-bottom:1px solid #0a1a2e;color:#b0cce0;vertical-align:middle;}
+.tbl tr:hover td{background:rgba(0,198,255,.03);}
+
+/* ── CHIPS ── */
+.chip{font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:10px;white-space:nowrap;display:inline-block;}
+.ch-g{background:#0e2a0e;color:var(--green);border:1px solid #1a4a1a;}
+.ch-a{background:#2a1a00;color:var(--amber);border:1px solid #4a3000;}
+.ch-r{background:#2a0808;color:var(--red);border:1px solid #4a1010;}
+.ch-b{background:#0a1a3a;color:#5aaaf0;border:1px solid #1a3060;}
+.ch-n{background:#121e2e;color:var(--muted);border:1px solid var(--border);}
+
+/* ── ACTION LIST ── */
+.alist{list-style:none;}
+.alist li{padding:9px 11px;border-radius:6px;margin-bottom:5px;font-size:11.5px;display:flex;align-items:flex-start;gap:9px;background:#060f1c;border-left:3px solid;}
+.al-g{border-color:var(--green);color:#80e0a0;}
+.al-a{border-color:var(--amber);color:#f0c060;}
+.al-r{border-color:var(--red);color:#f09090;}
+.al-b{border-color:var(--cyan);color:#80c4e8;}
+.atag{font-size:8.5px;font-weight:700;padding:2px 5px;border-radius:3px;white-space:nowrap;flex-shrink:0;margin-top:1px;}
+.atag-g{background:#0e2a0e;color:var(--green);}
+.atag-a{background:#2a1a00;color:var(--amber);}
+.atag-r{background:#2a0808;color:var(--red);}
+.atag-b{background:#0a1a3a;color:#5aaaf0;}
+
+/* ── FORM ── */
+.form-row{display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap;}
+.form-grp{display:flex;flex-direction:column;gap:4px;flex:1;min-width:140px;}
+.form-grp label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;}
+.form-grp input,.form-grp select,.form-grp textarea{background:#060f1c;border:1px solid var(--border);border-radius:5px;color:var(--text);padding:7px 10px;font-size:12px;outline:none;transition:border .15s;}
+.form-grp input:focus,.form-grp select:focus,.form-grp textarea:focus{border-color:var(--cyan);}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:none;transition:all .15s;text-decoration:none;}
+.btn-p{background:linear-gradient(135deg,var(--blue),var(--cyan));color:#fff;}
+.btn-p:hover{opacity:.85;}
+.btn-s{background:var(--surface2);color:#90c0e0;border:1px solid var(--border);}
+.btn-s:hover{background:#1a3050;}
+.btn-r{background:#2a0808;color:var(--red);border:1px solid #4a1010;}
+.btn-g{background:#0e2a0e;color:var(--green);border:1px solid #1a4a1a;}
+
+/* ── PBAR ── */
+.pbar-wrap{background:#040c18;border-radius:4px;overflow:hidden;}
+.pbar{height:8px;border-radius:4px;transition:width .5s;}
+.pb-g{background:linear-gradient(90deg,#1a7a4a,var(--green));}
+.pb-a{background:linear-gradient(90deg,#7a4a00,var(--amber));}
+.pb-r{background:linear-gradient(90deg,#6a1010,var(--red));}
+.pb-b{background:linear-gradient(90deg,var(--blue),var(--cyan));}
+
+/* ── SECTION HDR ── */
+.sh{font-size:12.5px;font-weight:800;color:#90c0e0;margin:18px 0 11px;display:flex;align-items:center;gap:8px;padding-bottom:7px;border-bottom:1px solid var(--border);}
+.sh::before{content:'';width:4px;height:16px;background:linear-gradient(180deg,var(--blue),var(--cyan));border-radius:2px;display:inline-block;}
+
+/* ── RESULT BOX ── */
+.result-box{background:#040c18;border:1px solid var(--border);border-radius:8px;padding:14px 16px;font-family:monospace;font-size:12px;color:#80e0c0;white-space:pre-wrap;line-height:1.7;margin-top:12px;}
+
+/* ── METER ── */
+.meter{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.meter-lbl{font-size:11px;color:var(--muted);min-width:130px;}
+.meter-bar{flex:1;background:#040c18;border-radius:3px;height:7px;overflow:hidden;}
+.meter-fill{height:100%;border-radius:3px;}
+.meter-val{font-size:11px;font-weight:700;min-width:52px;text-align:right;}
+
+/* ── TIMELINE ── */
+.tl{list-style:none;}
+.tl li{display:flex;gap:12px;padding:9px 0;border-bottom:1px solid #0a1a2e;font-size:11.5px;}
+.tl li:last-child{border:none;}
+.tl-d{color:#3a6a8a;min-width:78px;font-variant-numeric:tabular-nums;}
+.tl-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:3px;}
+
+/* ── BADGE ── */
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:700;padding:2px 7px;border-radius:3px;text-transform:uppercase;}
+.badge-cttx{background:#0a1a3a;color:#5aaaf0;}
+.badge-client{background:#2a1400;color:#c07000;}
+
+/* ── ALERT ── */
+.alert{background:linear-gradient(135deg,#2a1000,#3a1800);border:1px solid var(--amber);border-radius:8px;padding:11px 15px;margin-bottom:14px;display:flex;align-items:flex-start;gap:11px;font-size:11.5px;color:#f0c060;}
+
+/* ── SCROLL ── */
+.sx{overflow-x:auto;}
+.sx::-webkit-scrollbar{height:3px;}
+.sx::-webkit-scrollbar-thumb{background:#2a4a6a;border-radius:2px;}
+
+/* ── CALC CARD ── */
+.calc{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px;}
+.calc-out{background:#040c18;border:1px solid var(--border);border-radius:6px;padding:12px 14px;margin-top:12px;}
+.calc-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid #0a1a2e;font-size:12px;}
+.calc-row:last-child{border:none;}
+.calc-key{color:var(--muted);}
+.calc-val{font-weight:700;}
+
+/* ── LINK MONITOR ── */
+.lm-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;position:relative;}
+.lm-status{position:absolute;top:14px;right:14px;font-size:10px;font-weight:700;padding:3px 9px;border-radius:12px;}
+.lm-up{background:#0e2a0e;color:var(--green);}
+.lm-down{background:#2a0808;color:var(--red);}
+.lm-warn{background:#2a1a00;color:var(--amber);}
+.speed-bar{display:flex;align-items:center;gap:8px;margin:6px 0;}
+.speed-lbl{font-size:10px;color:var(--muted);width:28px;}
+.speed-track{flex:1;background:#040c18;border-radius:3px;height:10px;overflow:hidden;}
+.speed-fill{height:100%;border-radius:3px;transition:width 1s;}
+
+/* ── PLACEHOLDER ── */
+.ph{background:#060f1c;border:2px dashed var(--border);border-radius:10px;padding:40px 20px;text-align:center;color:var(--muted);}
+.ph-ico{font-size:44px;margin-bottom:14px;opacity:.35;}
+.ph h3{font-size:13px;font-weight:700;color:#5a8ab0;margin-bottom:7px;}
+.ph p{font-size:11.5px;line-height:1.75;max-width:380px;margin:0 auto 14px;}
+
+/* print */
+@media print{.topbar,.nav{display:none;}.panel{display:block!important;page-break-after:always;}}
+</style>
+</head>
+<body>
+
+<!-- ══════════ TOPBAR ══════════ -->
+<div class="topbar">
+  <div class="tb-left">
+    <div class="logo">CX</div>
+    <div>
+      <div class="tb-title">CTTX SMART ENGINEERING PLATFORM</div>
+      <div class="tb-sub">Fibre · Wireless · Survey · Commission · Monitor · Report</div>
+    </div>
+  </div>
+  <div class="tb-right">
+    <select id="proj-select" onchange="loadProject(this.value)">
+      <option value="oya">OYA Wind Farm</option>
+      <option value="new">+ New Project</option>
+    </select>
+    <div class="pill"><div class="dot dot-g"></div>CTTX LIVE</div>
+    <div class="pill" id="action-pill"><div class="dot dot-a"></div><span id="action-count">2</span> ACTIONS</div>
+    <div id="clock">--:--:--</div>
+  </div>
+</div>
+
+<!-- ══════════ NAV ══════════ -->
+<nav class="nav">
+  <div class="ntab active" onclick="tab('cockpit',this)"><span class="ni">🏠</span>COCKPIT</div>
+  <div class="ntab" onclick="tab('fibre',this)"><span class="ni">📡</span>FIBRE DESIGN</div>
+  <div class="ntab" onclick="tab('wireless',this)"><span class="ni">📶</span>WIRELESS DESIGN</div>
+  <div class="ntab" onclick="tab('survey',this)"><span class="ni">🗺</span>SURVEY &amp; SITE</div>
+  <div class="ntab" onclick="tab('build',this)"><span class="ni">🔨</span>BUILD &amp; COMMISSION</div>
+  <div class="ntab" onclick="tab('monitor',this)"><span class="ni">⚡</span>LINK MONITOR</div>
+  <div class="ntab" onclick="tab('reports',this)"><span class="ni">📋</span>REPORTS</div>
+  <div class="ntab" onclick="tab('projects',this)"><span class="ni">⚙️</span>PROJECTS</div>
+</nav>
+
+<!-- ════════════════════════════════════════
+     1. COCKPIT
+════════════════════════════════════════ -->
+<div id="t-cockpit" class="panel active">
+  <div class="alert">
+    <span style="font-size:17px;flex-shrink:0">⚠</span>
+    <div><b>OPEN ACTIONS:</b> WTG-08↔10 ring-close dome joints — re-splice 36 cores (1.155 dB → ≤0.10 dB). &nbsp;|&nbsp; WTG-01 OVH_14 cable: client fault pending repair before CTTX re-splice.</div>
+  </div>
+
+  <div class="g4" style="margin-bottom:14px;">
+    <div class="kpi kc-blue"><div class="kpi-ico">📁</div><div class="kpi-lbl">Active Projects</div><div class="kpi-val">1</div><div class="kpi-sub">OYA Wind Farm — Fibre</div></div>
+    <div class="kpi kc-green"><div class="kpi-ico">✅</div><div class="kpi-lbl">CTTX Nodes Pass</div><div class="kpi-val" id="ck-nodes">18<span style="font-size:13px;color:#3a7a5a">/18</span></div><div class="kpi-sub">All terminations compliant</div></div>
+    <div class="kpi kc-amber"><div class="kpi-ico">⚡</div><div class="kpi-lbl">Open Actions</div><div class="kpi-val" id="ck-actions">2</div><div class="kpi-sub">Dome re-splice + OVH cable</div></div>
+    <div class="kpi kc-teal"><div class="kpi-ico">🔌</div><div class="kpi-lbl">RC→LC Done</div><div class="kpi-val">272</div><div class="kpi-sub">Mid-coupler replacements</div></div>
+  </div>
+
+  <div class="g3" style="margin-bottom:14px;">
+    <div class="card">
+      <div class="card-h">📡 Fibre Ring Status</div>
+      <div class="calc-row"><span class="calc-key">Ring topology</span><span class="calc-val">G.652D 24-core</span></div>
+      <div class="calc-row"><span class="calc-key">Arm 1 (WTG-01→08)</span><span class="calc-val" style="color:var(--green)">✅ All pass</span></div>
+      <div class="calc-row"><span class="calc-key">Arm 2 (WTG-09→10)</span><span class="calc-val" style="color:var(--green)">✅ All pass</span></div>
+      <div class="calc-row"><span class="calc-key">Ring close (08↔10)</span><span class="calc-val" style="color:var(--amber)">⚠ Dome resplice</span></div>
+      <div class="calc-row"><span class="calc-key">Client span faults</span><span class="calc-val" style="color:#5aaaf0">5 spans</span></div>
+      <div style="margin-top:12px;">
+        <div style="font-size:9.5px;color:var(--muted);margin-bottom:4px;">PROJECT COMPLETION</div>
+        <div class="pbar-wrap"><div class="pbar pb-b" style="width:78%"></div></div>
+        <div style="font-size:10.5px;color:#4a7a9a;margin-top:4px;">78% — OTDR testing + dome re-splice outstanding</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-h">⚡ Open Action Items</div>
+      <ul class="alist">
+        <li class="al-r"><span class="atag atag-r">CTTX</span>Re-splice ring-close dome joints. 36 cores → ≤0.10 dB. OTDR all → SpecAfrica.</li>
+        <li class="al-a"><span class="atag atag-a">CLIENT</span>OVH_14 overhead cable fault (WTG-01, 12.9 dB). Client to repair first.</li>
+        <li class="al-a"><span class="atag atag-a">CLIENT</span>5 span cable faults — buried cable physical damage. Client investigation.</li>
+        <li class="al-b"><span class="atag atag-b">PENDING</span>Bottom arm span distances TBC — OTDR length measurements needed.</li>
+        <li class="al-g"><span class="atag atag-g">DONE</span>272 RC→LC replacements. Met Masts field-verified. Ring diagram Rev 7.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-h">📅 Recent Activity</div>
+      <ul class="tl">
+        <li><span class="tl-d">23 Jun 26</span><div class="tl-dot" style="background:var(--cyan)"></div><span>OTDR Ring Diagram Rev 7 saved — 18 nodes mapped</span></li>
+        <li><span class="tl-d">16 Jun 26</span><div class="tl-dot" style="background:var(--green)"></div><span>WTG-08: 24 splices, 12 AC→LC</span></li>
+        <li><span class="tl-d">10 Jun 26</span><div class="tl-dot" style="background:var(--green)"></div><span>WTG-07, 09 reports via WhatsApp</span></li>
+        <li><span class="tl-d">10 Jun 26</span><div class="tl-dot" style="background:var(--amber)"></div><span>5 client cable faults identified</span></li>
+        <li><span class="tl-d">10 Jun 26</span><div class="tl-dot" style="background:var(--purple)"></div><span>272 RC→LC mid-couplers completed</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="card-h">📊 Splicing Progress</div>
+      <div class="meter"><span class="meter-lbl">Splices logged</span><div class="meter-bar"><div class="meter-fill pb-b" style="width:55%"></div></div><span class="meter-val" style="color:var(--cyan)">100</span></div>
+      <div class="meter"><span class="meter-lbl">AC→LC done</span><div class="meter-bar"><div class="meter-fill pb-g" style="width:12%"></div></div><span class="meter-val" style="color:var(--green)">34</span></div>
+      <div class="meter"><span class="meter-lbl">WTGs active</span><div class="meter-bar"><div class="meter-fill pb-a" style="width:22%"></div></div><span class="meter-val" style="color:var(--amber)">4/18</span></div>
+      <div class="meter"><span class="meter-lbl">Fully tested</span><div class="meter-bar"><div class="meter-fill pb-r" style="width:0%"></div></div><span class="meter-val" style="color:var(--red)">0/18</span></div>
+    </div>
+    <div class="card">
+      <div class="card-h">🏗 Platform Modules</div>
+      <ul class="alist">
+        <li class="al-g"><span class="atag atag-g">LIVE</span>Fibre Design — splice budget, OTDR, ring diagram</li>
+        <li class="al-g"><span class="atag atag-g">LIVE</span>Field Reports — WhatsApp parser → JSON tracker</li>
+        <li class="al-g"><span class="atag atag-g">LIVE</span>Wireless Design — link budget + Fresnel calculator</li>
+        <li class="al-g"><span class="atag atag-g">LIVE</span>Link Monitor — speed test + uptime dashboard</li>
+        <li class="al-b"><span class="atag atag-b">READY</span>Build &amp; Commission — punch list, IFC tracker</li>
+        <li class="al-b"><span class="atag atag-b">READY</span>Report Generator — PDF-ready client reports</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     2. FIBRE DESIGN
+════════════════════════════════════════ -->
+<div id="t-fibre" class="panel">
+
+  <div class="sh">Fibre Design & OTDR Engineering</div>
+
+  <div class="g3" style="margin-bottom:14px;">
+    <!-- Splice Loss Budget Calculator -->
+    <div class="calc">
+      <div class="card-h">🧮 SPLICE LOSS BUDGET CALCULATOR</div>
+      <div class="form-row">
+        <div class="form-grp"><label>Span length (km)</label><input id="fb-len" type="number" value="1.5" step="0.1" oninput="calcFibre()"></div>
+        <div class="form-grp"><label>Attenuation (dB/km)</label><input id="fb-att" type="number" value="0.75" step="0.01" oninput="calcFibre()"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-grp"><label>No. of splices</label><input id="fb-spl" type="number" value="2" oninput="calcFibre()"></div>
+        <div class="form-grp"><label>Loss/splice (dB)</label><input id="fb-sloss" type="number" value="0.10" step="0.01" oninput="calcFibre()"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-grp"><label>No. of connectors</label><input id="fb-con" type="number" value="2" oninput="calcFibre()"></div>
+        <div class="form-grp"><label>Loss/connector (dB)</label><input id="fb-closs" type="number" value="0.30" step="0.01" oninput="calcFibre()"></div>
+      </div>
+      <div class="form-grp" style="margin-bottom:10px;"><label>Safety margin (dB)</label><input id="fb-margin" type="number" value="3.0" step="0.1" oninput="calcFibre()"></div>
+      <div class="calc-out" id="fb-result"></div>
+    </div>
+
+    <!-- OTDR Fault Locator -->
+    <div class="calc">
+      <div class="card-h">🔭 OTDR FAULT LOCATOR</div>
+      <div class="form-row">
+        <div class="form-grp"><label>Total span length (km)</label><input id="of-span" type="number" value="2.503" step="0.001" oninput="calcOTDR()"></div>
+        <div class="form-grp"><label>Fault position (km)</label><input id="of-pos" type="number" value="1.8" step="0.001" oninput="calcOTDR()"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-grp"><label>Event loss (dB)</label><input id="of-loss" type="number" value="1.155" step="0.001" oninput="calcOTDR()"></div>
+        <div class="form-grp"><label>Reflectance (dB)</label><input id="of-refl" type="number" value="-45" step="1" oninput="calcOTDR()"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-grp"><label>Wavelength (nm)</label><select id="of-wl" onchange="calcOTDR()"><option value="1310">1310 nm (OS2)</option><option value="1550">1550 nm (OS2)</option><option value="850">850 nm (OM)</option></select></div>
+        <div class="form-grp"><label>Threshold (dB)</label><input id="of-thr" type="number" value="0.10" step="0.01" oninput="calcOTDR()"></div>
+      </div>
+      <div class="calc-out" id="of-result"></div>
+    </div>
+
+    <!-- Dome Joint Budget -->
+    <div class="calc">
+      <div class="card-h">🔘 DOME JOINT BUDGET</div>
+      <div class="form-row">
+        <div class="form-grp"><label>No. of dome joints</label><input id="dj-num" type="number" value="3" oninput="calcDome()"></div>
+        <div class="form-grp"><label>Splices per dome</label><input id="dj-spl" type="number" value="12" oninput="calcDome()"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-grp"><label>Reading (dB)</label><input id="dj-read" type="number" value="1.155" step="0.001" oninput="calcDome()"></div>
+        <div class="form-grp"><label>Budget/splice (dB)</label><input id="dj-bud" type="number" value="0.10" step="0.01" oninput="calcDome()"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-grp"><label>Span length (km)</label><input id="dj-span" type="number" value="1.224" step="0.001" oninput="calcDome()"></div>
+        <div class="form-grp"><label>Span loss (dB/km)</label><input id="dj-atten" type="number" value="0.746" step="0.001" oninput="calcDome()"></div>
+      </div>
+      <div class="calc-out" id="dj-result"></div>
+    </div>
+  </div>
+
+  <!-- Node Status Table -->
+  <div class="card">
+    <div class="card-h">📡 NODE STATUS — ALL TURBINES</div>
+    <div class="sx">
+      <table class="tbl">
+        <thead><tr><th>Node</th><th>Arm</th><th>CTTX Node</th><th>Node Loss (dB)</th><th>Span (dB/km)</th><th>Span Status</th><th>Scope</th><th>RMU</th><th>Met Mast</th></tr></thead>
+        <tbody id="fibre-node-tbl"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Ring Diagram -->
+  <div class="sh">Interactive OTDR Ring Diagram</div>
+  <div style="background:#fff;border-radius:8px;overflow:hidden;border:2px solid var(--border);">
+    <iframe src="reports/OYA-Fibre-Ring-Diagram-Rev7.html" height="520" style="width:100%;border:none;display:block;" title="OTDR Ring"></iframe>
+  </div>
+  <div style="margin-top:8px;text-align:right;"><a class="btn btn-s" href="reports/OYA-Fibre-Ring-Diagram-Rev7.html" target="_blank">↗ Open Full Screen</a></div>
+</div>
+
+<!-- ════════════════════════════════════════
+     3. WIRELESS DESIGN
+════════════════════════════════════════ -->
+<div id="t-wireless" class="panel">
+
+  <div class="sh">Wireless Link Design & Planning</div>
+
+  <div class="g3" style="margin-bottom:14px;">
+
+    <!-- Link Budget Calculator -->
+    <div class="calc">
+      <div class="card-h">📶 LINK BUDGET CALCULATOR</div>
+      <div class="form-row">
+        <div class="form-grp"><label>Frequency (GHz)</label><input id="lb-freq" type="number" value="5.8" step="0.1" oninput="calcLink()"></div>
+        <div class="form-grp"><label>Distance (km)</label><input id="lb-dist" type="number" value="2.5" step="0.1" oninput="calcLink()"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-grp"><label>Tx Power (dBm)</label><input id="lb-tx" type="number" value="20" step="1" oninput="calcLink()"></div>
+        <div class="form-grp"><label>Antenna Gain (dBi)</label><input id="lb-gain" type="number" value="23" step="0.5" oninput="calcLink()"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-grp"><label>Cable Loss (dB)</label><input id="lb-cable" type="number" value="1.5" step="0.1" oninput="calcLink()"></div>
+        <div class="form-grp"><label>Rx Sensitivity (dBm)</label><input id="lb-sens" type="number" value="-80" step="1" oninput="calcLink()"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-grp"><label>Tx+Rx antennas</label><select id="lb-sym" onchange="calcLink()"><option value="2">Both ends (×2 gain)</option><option value="1">One end only</option></select></div>
+        <div class="form-grp"><label>Rain zone</label><select id="lb-rain" onchange="calcLink()"><option value="0">Dry / arid (0 dB)</option><option value="3">Coastal / tropical (+3 dB)</option><option value="6">High rainfall (+6 dB)</option></select></div>
+      </div>
+      <div class="calc-out" id="lb-result"></div>
+    </div>
+
+    <!-- Fresnel Zone Calculator -->
+    <div class="calc">
+      <div class="card-h">🔵 FRESNEL ZONE CLEARANCE</div>
+      <div class="form-row">
+        <div class="form-grp"><label>Distance (km)</label><input id="fz-dist" type="number" value="2.5" step="0.1" oninput="calcFresnel()"></div>
+        <div class="form-grp"><label>Frequency (GHz)</label><input id="fz-freq" type="number" value="5.8" step="0.1" oninput="calcFresnel()"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-grp"><label>Height A (m AGL)</label><input id="fz-ha" type="number" value="30" step="1" oninput="calcFresnel()"></div>
+        <div class="form-grp"><label>Height B (m AGL)</label><input id="fz-hb" type="number" value="30" step="1" oninput="calcFresnel()"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-grp"><label>Obstacle height (m)</label><input id="fz-obs" type="number" value="15" step="1" oninput="calcFresnel()"></div>
+        <div class="form-grp"><label>Obstacle position (km)</label><input id="fz-opos" type="number" value="1.2" step="0.1" oninput="calcFresnel()"></div>
+      </div>
+      <div class="calc-out" id="fz-result"></div>
+    </div>
+
+    <!-- Antenna Height Calculator -->
+    <div class="calc">
+      <div class="card-h">📏 ANTENNA HEIGHT ESTIMATOR</div>
+      <div class="form-row">
+        <div class="form-grp"><label>Distance (km)</label><input id="ah-dist" type="number" value="5" step="0.1" oninput="calcAntHeight()"></div>
+        <div class="form-grp"><label>Frequency (GHz)</label><input id="ah-freq" type="number" value="5.8" step="0.1" oninput="calcAntHeight()"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-grp"><label>Terrain clearance (m)</label><input id="ah-terr" type="number" value="10" step="1" oninput="calcAntHeight()"></div>
+        <div class="form-grp"><label>Earth radius factor (k)</label><select id="ah-k" onchange="calcAntHeight()"><option value="1.33">4/3 (standard)</option><option value="1">1 (flat earth)</option><option value="0.67">2/3 (ducting)</option></select></div>
+      </div>
+      <div class="form-row">
+        <div class="form-grp"><label>Max obstacle height (m)</label><input id="ah-obs" type="number" value="20" step="1" oninput="calcAntHeight()"></div>
+      </div>
+      <div class="calc-out" id="ah-result"></div>
+    </div>
+  </div>
+
+  <!-- Link Planner Table -->
+  <div class="card">
+    <div class="card-h">🗺 WIRELESS LINK PLANNER</div>
+    <div class="sx">
+      <table class="tbl" id="link-tbl">
+        <thead><tr><th>Link ID</th><th>Name</th><th>Freq (GHz)</th><th>Distance (km)</th><th>FSPL (dB)</th><th>Tx (dBm)</th><th>Gain (dBi)</th><th>RSL (dBm)</th><th>Margin (dB)</th><th>Fresnel (m)</th><th>Status</th></tr></thead>
+        <tbody id="link-tbl-body"></tbody>
+      </table>
+    </div>
+    <div style="margin-top:12px;display:flex;gap:8px;">
+      <button class="btn btn-p" onclick="addLink()">+ Add Link</button>
+      <button class="btn btn-s" onclick="clearLinks()">Clear All</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     4. SURVEY & SITE
+════════════════════════════════════════ -->
+<div id="t-survey" class="panel">
+
+  <div class="sh">Site Survey & Field Assessment</div>
+
+  <div class="g2" style="margin-bottom:14px;">
+    <div class="card">
+      <div class="card-h">📍 SITE SURVEY FORM</div>
+      <div class="form-row">
+        <div class="form-grp"><label>Site / Node ID</label><input id="sv-id" type="text" placeholder="WTG-01 / NODE-A"></div>
+        <div class="form-grp"><label>Survey Date</label><input id="sv-date" type="date"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-grp"><label>GPS Lat</label><input id="sv-lat" type="text" placeholder="-28.123456"></div>
+        <div class="form-grp"><label>GPS Lon</label><input id="sv-lon" type="text" placeholder="27.654321"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-grp"><label>Site type</label><select id="sv-type"><option>Wind Turbine (WTG)</option><option>Substation</option><option>OEM Building</option><option>Radio Mast</option><option>Repeater Site</option><option>MH / Splice Point</option><option>RMU</option><option>Met Mast</option></select></div>
+        <div class="form-grp"><label>Technician</label><input id="sv-tech" type="text" placeholder="Name"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-grp" style="flex:2"><label>Access notes / challenges</label><textarea id="sv-notes" rows="2" placeholder="Access route, key holder, safety requirements..."></textarea></div>
+      </div>
+      <div class="form-row">
+        <div class="form-grp"><label>Fibre tray installed?</label><select id="sv-tray"><option>Yes</option><option>No</option><option>Partial</option></select></div>
+        <div class="form-grp"><label>Cable pulled?</label><select id="sv-cable"><option>Yes</option><option>No</option><option>Partial</option></select></div>
+        <div class="form-grp"><label>Labels on?</label><select id="sv-labels"><option>Yes</option><option>No</option></select></div>
+      </div>
+      <div class="form-row">
+        <div class="form-grp"><label>Photos taken?</label><select id="sv-photos"><option>Yes</option><option>No</option></select></div>
+        <div class="form-grp"><label>Drawing updated?</label><select id="sv-drawing"><option>Yes</option><option>No</option></select></div>
+      </div>
+      <div style="margin-top:8px;display:flex;gap:8px;">
+        <button class="btn btn-p" onclick="saveSurvey()">💾 Save Survey</button>
+        <button class="btn btn-s" onclick="clearSurvey()">Clear</button>
+      </div>
+      <div id="sv-out" class="result-box" style="display:none;margin-top:10px;"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-h">📋 SITE SURVEY CHECKLIST</div>
+      <div id="checklist-items"></div>
+      <div style="margin-top:12px;">
+        <button class="btn btn-g" onclick="checkAll()">✅ Check All</button>
+        <button class="btn btn-s" onclick="uncheckAll()" style="margin-left:6px;">Clear</button>
+        <div id="chk-score" style="margin-top:10px;font-size:12px;color:var(--muted);"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h">📦 EQUIPMENT INVENTORY — SPLICE TRAY SPEC (OYA Rev 7)</div>
+    <div class="sx">
+      <table class="tbl">
+        <thead><tr><th>Ports</th><th>Fibres</th><th>Connector</th><th>Label</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td>1–12</td><td>12</td><td><span class="chip ch-b">LC</span></td><td>Mainline Input</td><td>Ring Arm IN</td></tr>
+          <tr><td>13–24</td><td>12</td><td><span class="chip ch-b">LC</span></td><td>Mainline Output</td><td>Ring Arm OUT</td></tr>
+          <tr><td>25–28</td><td>4</td><td><span class="chip ch-b">LC</span></td><td>RMU</td><td>Leave spare if no RMU</td></tr>
+          <tr><td>29–32</td><td>4</td><td><span class="chip ch-n">SC</span></td><td>Met Mast</td><td>Modbus-TCP | Leave spare if no MM</td></tr>
+          <tr><td>33–36</td><td>4</td><td><span class="chip ch-n">—</span></td><td>Spare</td><td>Leave empty</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="margin-top:12px;" class="g3">
+      <div><div style="font-size:9.5px;color:var(--muted);margin-bottom:4px;">MAINLINE ONLY</div><div style="font-size:22px;font-weight:800;color:var(--cyan)">24</div><div style="font-size:10px;color:var(--muted)">splices</div></div>
+      <div><div style="font-size:9.5px;color:var(--muted);margin-bottom:4px;">WITH RMU</div><div style="font-size:22px;font-weight:800;color:var(--teal)">28</div><div style="font-size:10px;color:var(--muted)">splices</div></div>
+      <div><div style="font-size:9.5px;color:var(--muted);margin-bottom:4px;">WITH MET MAST</div><div style="font-size:22px;font-weight:800;color:var(--purple)">32</div><div style="font-size:10px;color:var(--muted)">splices</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     5. BUILD & COMMISSION
+════════════════════════════════════════ -->
+<div id="t-build" class="panel">
+
+  <div class="sh">Build & Commissioning Tracker</div>
+
+  <div class="g2" style="margin-bottom:14px;">
+    <div class="card">
+      <div class="card-h">📋 IFC DRAWING TRACKER</div>
+      <table class="tbl">
+        <thead><tr><th>Drawing Ref</th><th>Rev</th><th>Title</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr><td>ZA-OYA0-EN-EL-CC-9526</td><td>Rev 7</td><td>Fibre Optic Single Line Diagram</td><td><span class="chip ch-g">IFC</span></td><td><span class="chip ch-n">As-built pending</span></td></tr>
+          <tr><td>CTTX-OYA-OTDR-2026-01</td><td>—</td><td>OTDR Ring Loss Map</td><td><span class="chip ch-g">COMPLETE</span></td><td><span class="chip ch-g">Submitted</span></td></tr>
+          <tr><td>Splice Schedule</td><td>—</td><td>Per-WTG splice & port schedule</td><td><span class="chip ch-a">IN PROGRESS</span></td><td><span class="chip ch-a">Update needed</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="card-h">✅ COMMISSIONING PUNCH LIST</div>
+      <table class="tbl">
+        <thead><tr><th>Item</th><th>Owner</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>All 18 WTG nodes terminated</td><td><span class="badge badge-cttx">CTTX</span></td><td><span class="chip ch-g">DONE</span></td></tr>
+          <tr><td>OTDR test all spans — Arm 1</td><td><span class="badge badge-cttx">CTTX</span></td><td><span class="chip ch-a">PARTIAL</span></td></tr>
+          <tr><td>OTDR test all spans — Arm 2</td><td><span class="badge badge-cttx">CTTX</span></td><td><span class="chip ch-a">PARTIAL</span></td></tr>
+          <tr><td>Re-splice ring-close dome joints</td><td><span class="badge badge-cttx">CTTX</span></td><td><span class="chip ch-r">OPEN</span></td></tr>
+          <tr><td>Bottom arm distances OTDR measured</td><td><span class="badge badge-cttx">CTTX</span></td><td><span class="chip ch-r">OPEN</span></td></tr>
+          <tr><td>OVH_14 cable repair (WTG-01)</td><td><span class="badge badge-client">CLIENT</span></td><td><span class="chip ch-r">CLIENT</span></td></tr>
+          <tr><td>5× buried cable fault repairs</td><td><span class="badge badge-client">CLIENT</span></td><td><span class="chip ch-r">CLIENT</span></td></tr>
+          <tr><td>272 RC→LC replacements</td><td><span class="badge badge-cttx">CTTX</span></td><td><span class="chip ch-g">DONE</span></td></tr>
+          <tr><td>Met Mast 1 &amp; 2 field-verified</td><td><span class="badge badge-cttx">CTTX</span></td><td><span class="chip ch-g">DONE</span></td></tr>
+          <tr><td>Submit all OTDR results to SpecAfrica</td><td><span class="badge badge-cttx">CTTX</span></td><td><span class="chip ch-a">IN PROGRESS</span></td></tr>
+          <tr><td>As-built drawings issued</td><td><span class="badge badge-cttx">CTTX</span></td><td><span class="chip ch-r">OPEN</span></td></tr>
+          <tr><td>Handover certificate signed</td><td><span class="badge badge-cttx">CTTX</span></td><td><span class="chip ch-r">OPEN</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="card-h">📐 TEST CERTIFICATE GENERATOR</div>
+      <div class="form-row">
+        <div class="form-grp"><label>Client name</label><input id="tc-client" type="text" value="OYA / SpecAfrica"></div>
+        <div class="form-grp"><label>Project ref</label><input id="tc-ref" type="text" value="CTTX-OYA-OTDR-2026-01"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-grp"><label>Drawing ref</label><input id="tc-draw" type="text" value="ZA-OYA0-EN-EL-CC-9526 Rev 7"></div>
+        <div class="form-grp"><label>Test date</label><input id="tc-date" type="date"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-grp"><label>Instrument</label><input id="tc-inst" type="text" value="EXFO MaxTester"></div>
+        <div class="form-grp"><label>Wavelength (nm)</label><input id="tc-wl" type="text" value="1310"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-grp"><label>Tested by</label><input id="tc-tech" type="text" value="Freddie Mackay"></div>
+        <div class="form-grp"><label>Approved by</label><input id="tc-pm" type="text" value="Gerhard"></div>
+      </div>
+      <button class="btn btn-p" onclick="genCert()" style="margin-top:8px;">📄 Generate Certificate</button>
+      <div id="tc-out" style="display:none;"></div>
+    </div>
+    <div class="card">
+      <div class="card-h">📊 COMPLETION SUMMARY</div>
+      <div class="meter" style="margin-bottom:12px;"><span class="meter-lbl" style="min-width:160px;">CTTX scope done</span><div class="meter-bar"><div class="meter-fill pb-b" style="width:65%"></div></div><span class="meter-val" style="color:var(--cyan)">65%</span></div>
+      <div class="meter" style="margin-bottom:12px;"><span class="meter-lbl" style="min-width:160px;">OTDR tests submitted</span><div class="meter-bar"><div class="meter-fill pb-a" style="width:45%"></div></div><span class="meter-val" style="color:var(--amber)">45%</span></div>
+      <div class="meter" style="margin-bottom:12px;"><span class="meter-lbl" style="min-width:160px;">Punch list cleared</span><div class="meter-bar"><div class="meter-fill pb-g" style="width:42%"></div></div><span class="meter-val" style="color:var(--green)">5/12</span></div>
+      <div class="meter"><span class="meter-lbl" style="min-width:160px;">Client items resolved</span><div class="meter-bar"><div class="meter-fill pb-r" style="width:0%"></div></div><span class="meter-val" style="color:var(--red)">0/6</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     6. LINK MONITOR
+════════════════════════════════════════ -->
+<div id="t-monitor" class="panel">
+
+  <div class="sh">Link Monitor — Speed Tests & Uptime</div>
+
+  <div class="g4" style="margin-bottom:14px;">
+    <div class="kpi kc-green"><div class="kpi-ico">⚡</div><div class="kpi-lbl">Links Monitored</div><div class="kpi-val" id="lm-total">—</div><div class="kpi-sub">Configure below</div></div>
+    <div class="kpi kc-blue"><div class="kpi-ico">⬆</div><div class="kpi-lbl">Avg Download</div><div class="kpi-val" id="lm-dl">—</div><div class="kpi-sub">Mbps</div></div>
+    <div class="kpi kc-teal"><div class="kpi-ico">⬇</div><div class="kpi-lbl">Avg Upload</div><div class="kpi-val" id="lm-ul">—</div><div class="kpi-sub">Mbps</div></div>
+    <div class="kpi kc-amber"><div class="kpi-ico">📶</div><div class="kpi-lbl">Avg Latency</div><div class="kpi-val" id="lm-lat">—</div><div class="kpi-sub">ms</div></div>
+  </div>
+
+  <div class="g2" style="margin-bottom:14px;">
+    <!-- Speed Test Runner -->
+    <div class="card">
+      <div class="card-h">🚀 SPEED TEST — LOG RESULT</div>
+      <div class="form-row">
+        <div class="form-grp"><label>Link / Site name</label><input id="st-name" type="text" placeholder="WTG-08 ↔ OEM"></div>
+        <div class="form-grp"><label>Test date/time</label><input id="st-dt" type="datetime-local"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-grp"><label>Download (Mbps)</label><input id="st-dl" type="number" placeholder="e.g. 95.4" step="0.1"></div>
+        <div class="form-grp"><label>Upload (Mbps)</label><input id="st-ul" type="number" placeholder="e.g. 93.1" step="0.1"></div>
+        <div class="form-grp"><label>Latency (ms)</label><input id="st-lat" type="number" placeholder="e.g. 2.4" step="0.1"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-grp"><label>Jitter (ms)</label><input id="st-jit" type="number" placeholder="e.g. 0.3" step="0.1"></div>
+        <div class="form-grp"><label>Packet loss (%)</label><input id="st-loss" type="number" placeholder="0.0" step="0.01"></div>
+        <div class="form-grp"><label>Test tool</label><select id="st-tool"><option>iPerf3</option><option>Speedtest CLI</option><option>Ookla</option><option>nPerf</option><option>Manual</option></select></div>
+      </div>
+      <div class="form-row">
+        <div class="form-grp"><label>SLA target (Mbps)</label><input id="st-sla" type="number" placeholder="100" step="1"></div>
+        <div class="form-grp"><label>Link type</label><select id="st-type"><option>Fibre</option><option>Microwave PTP</option><option>Licensed PTP</option><option>WiFi PtP</option><option>LTE/4G</option></select></div>
+      </div>
+      <div style="margin-top:8px;display:flex;gap:8px;">
+        <button class="btn btn-p" onclick="logSpeed()">⚡ Log Result</button>
+        <button class="btn btn-s" onclick="clearSpeedLog()">Clear Log</button>
+      </div>
+    </div>
+
+    <!-- iPerf Command Generator -->
+    <div class="card">
+      <div class="card-h">💻 iPERF3 COMMAND GENERATOR</div>
+      <div class="form-row">
+        <div class="form-grp"><label>Server IP</label><input id="ip-srv" type="text" placeholder="192.168.1.1" oninput="genIperf()"></div>
+        <div class="form-grp"><label>Duration (s)</label><input id="ip-dur" type="number" value="30" oninput="genIperf()"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-grp"><label>Parallel streams</label><input id="ip-par" type="number" value="4" oninput="genIperf()"></div>
+        <div class="form-grp"><label>Protocol</label><select id="ip-proto" onchange="genIperf()"><option value="">TCP</option><option value="-u -b 1G">UDP 1Gbps</option><option value="-u -b 100M">UDP 100Mbps</option></select></div>
+      </div>
+      <div class="form-row">
+        <div class="form-grp"><label>Interval (s)</label><input id="ip-int" type="number" value="1" oninput="genIperf()"></div>
+        <div class="form-grp"><label>Port</label><input id="ip-port" type="number" value="5201" oninput="genIperf()"></div>
+      </div>
+      <div style="margin-top:6px;">
+        <div style="font-size:9.5px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;font-weight:700;">SERVER COMMAND</div>
+        <div class="result-box" id="ip-server-cmd" style="margin-top:0;"></div>
+        <div style="font-size:9.5px;color:var(--muted);margin:8px 0 4px;text-transform:uppercase;font-weight:700;">CLIENT COMMAND</div>
+        <div class="result-box" id="ip-client-cmd" style="margin-top:0;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Speed Log Table -->
+  <div class="card">
+    <div class="card-h">📊 SPEED TEST LOG</div>
+    <div class="sx">
+      <table class="tbl">
+        <thead><tr><th>Date/Time</th><th>Link</th><th>Type</th><th>DL (Mbps)</th><th>UL (Mbps)</th><th>Latency (ms)</th><th>Jitter</th><th>Pkt Loss</th><th>SLA</th><th>Tool</th><th>Result</th></tr></thead>
+        <tbody id="speed-log"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     7. REPORTS
+════════════════════════════════════════ -->
+<div id="t-reports" class="panel">
+
+  <div class="sh">Report Generator & Field Reports Archive</div>
+
+  <div class="g2" style="margin-bottom:14px;">
+    <div class="card">
+      <div class="card-h">📋 PARSE WHATSAPP FIELD REPORT</div>
+      <p style="font-size:11.5px;color:var(--muted);margin-bottom:10px;line-height:1.7;">Paste raw WhatsApp chat text. Extracts turbine ID, splices, AC→LC changes, RMU, challenges and formats for the tracker.</p>
+      <textarea id="rp-input" rows="8" style="width:100%;background:#040c18;border:1px solid var(--border);border-radius:6px;color:var(--text);padding:10px;font-size:11.5px;font-family:monospace;resize:vertical;" placeholder="Paste WhatsApp report here...&#10;&#10;*TURBINE NUMBER: WTG-09&#10;*DATE: 23/06/2026&#10;*SPLICES COMPLETED TODAY: 20&#10;*RMU COMPLETED: 0&#10;*MATE/MASK COMPLETED: 0&#10;*TOTAL SPLICES / TERMINATIONS TESTED: 0&#10;*MARKED ON DRAWING (Y/N): N&#10;*AC → LC CONNECTOR CHANGES: 10&#10;*CHALLENGES / DELAYS: No&#10;*PHOTOS ATTACHED (Y/N): Y"></textarea>
+      <div style="margin-top:8px;display:flex;gap:8px;">
+        <button class="btn btn-p" onclick="parseWhatsApp()">⚡ Parse Report</button>
+        <button class="btn btn-s" onclick="document.getElementById('rp-input').value=''">Clear</button>
+      </div>
+      <div id="rp-out" class="result-box" style="display:none;margin-top:10px;"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-h">📄 CLIENT REPORT GENERATOR</div>
+      <div class="form-row">
+        <div class="form-grp"><label>Report type</label><select id="rg-type"><option>Progress Report</option><option>OTDR Test Report</option><option>Commissioning Certificate</option><option>Fault Investigation</option><option>Handover Report</option></select></div>
+        <div class="form-grp"><label>Date</label><input id="rg-date" type="date"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-grp"><label>Client</label><input id="rg-client" type="text" value="OYA / SpecAfrica"></div>
+        <div class="form-grp"><label>Ref</label><input id="rg-ref" type="text" value="CTTX-OYA-OTDR-2026-01"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-grp" style="flex:2"><label>Executive summary</label><textarea id="rg-summary" rows="3" placeholder="Brief summary for client..."></textarea></div>
+      </div>
+      <div style="margin-top:8px;display:flex;gap:8px;">
+        <button class="btn btn-p" onclick="genReport()">📄 Generate Report</button>
+        <button class="btn btn-s" onclick="window.print()">🖨 Print</button>
+      </div>
+      <div id="rg-out" class="result-box" style="display:none;margin-top:10px;"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h">📁 REPORTS ARCHIVE</div>
+    <table class="tbl">
+      <thead><tr><th>Date</th><th>Type</th><th>Ref</th><th>Title</th><th>Status</th><th>File</th></tr></thead>
+      <tbody>
+        <tr><td>23 Jun 26</td><td>OTDR Diagram</td><td>CTTX-OYA-OTDR-2026-01</td><td>Fibre Optic Ring Diagram Rev 7</td><td><span class="chip ch-g">FINAL</span></td><td><a class="btn btn-s" style="padding:3px 9px;font-size:10px;" href="reports/OYA-Fibre-Ring-Diagram-Rev7.html" target="_blank">↗ Open</a></td></tr>
+        <tr><td>10 Jun 26</td><td>Progress</td><td>CTTX-OYA-OTDR-2026-01</td><td>OYA Progress Report</td><td><span class="chip ch-g">ISSUED</span></td><td><a class="btn btn-s" style="padding:3px 9px;font-size:10px;" href="reports/OYA-Progress-Report-2026-06-10.md" target="_blank">↗ Open</a></td></tr>
+        <tr><td>10 Jun 26</td><td>Client</td><td>CTTX-OYA-OTDR-2026-01</td><td>OYA Client Report</td><td><span class="chip ch-g">ISSUED</span></td><td><a class="btn btn-s" style="padding:3px 9px;font-size:10px;" href="reports/OYA-Client-Report-2026-06-10.md" target="_blank">↗ Open</a></td></tr>
+        <tr><td>10 Jun 26</td><td>Field</td><td>—</td><td>Freddy Daily Summary</td><td><span class="chip ch-g">FILED</span></td><td><a class="btn btn-s" style="padding:3px 9px;font-size:10px;" href="reports/Freddy-Daily-Summary-2026-06-10.md" target="_blank">↗ Open</a></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     8. PROJECTS
+════════════════════════════════════════ -->
+<div id="t-projects" class="panel">
+
+  <div class="sh">Project Manager — Multi-Client</div>
+
+  <div class="g2" style="margin-bottom:14px;">
+    <div class="card">
+      <div class="card-h">📁 ACTIVE PROJECTS</div>
+      <table class="tbl">
+        <thead><tr><th>ID</th><th>Client</th><th>Project</th><th>Type</th><th>Status</th><th>Progress</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span class="chip ch-b">CTTX-OYA-01</span></td>
+            <td>OYA / SpecAfrica</td>
+            <td>Wind Farm Fibre Ring</td>
+            <td><span class="chip ch-n">Fibre Ring</span></td>
+            <td><span class="chip ch-a">ACTIVE</span></td>
+            <td>
+              <div class="pbar-wrap" style="min-width:80px;"><div class="pbar pb-b" style="width:78%"></div></div>
+              <div style="font-size:9.5px;color:var(--muted);margin-top:2px;">78%</div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <button class="btn btn-p" style="margin-top:12px;" onclick="tab('new-proj',null)">+ New Project</button>
+    </div>
+
+    <div class="card">
+      <div class="card-h">🆕 NEW PROJECT SETUP</div>
+      <div class="form-row">
+        <div class="form-grp"><label>Client name</label><input id="np-client" type="text" placeholder="Client / Company"></div>
+        <div class="form-grp"><label>Project name</label><input id="np-name" type="text" placeholder="Wind Farm / Backhaul / etc."></div>
+      </div>
+      <div class="form-row">
+        <div class="form-grp"><label>Project type</label><select id="np-type"><option>Fibre Ring</option><option>Fibre Star</option><option>Fibre P2P</option><option>Wireless PTP</option><option>Wireless PTMP</option><option>Hybrid Fibre+Wireless</option></select></div>
+        <div class="form-grp"><label>Location</label><input id="np-loc" type="text" placeholder="Site, Country"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-grp"><label>CTTX Ref</label><input id="np-ref" type="text" placeholder="CTTX-CLIENT-TYPE-YEAR-NN"></div>
+        <div class="form-grp"><label>Drawing ref</label><input id="np-draw" type="text" placeholder="Drawing Rev X"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-grp"><label>No. of nodes</label><input id="np-nodes" type="number" placeholder="18" min="1"></div>
+        <div class="form-grp"><label>Cable type</label><select id="np-cable"><option>G.652D Singlemode</option><option>G.657A Singlemode</option><option>OM3 Multimode</option><option>OM4 Multimode</option><option>OPGW</option></select></div>
+      </div>
+      <div class="form-row">
+        <div class="form-grp"><label>Lead tech</label><input id="np-tech" type="text" placeholder="Technician name"></div>
+        <div class="form-grp"><label>Start date</label><input id="np-start" type="date"></div>
+      </div>
+      <button class="btn btn-p" onclick="createProject()" style="margin-top:8px;">🚀 Create Project</button>
+      <div id="np-out" class="result-box" style="display:none;margin-top:10px;"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h">📦 REPLICATION GUIDE — HOW TO ONBOARD A NEW CLIENT</div>
+    <ul class="alist">
+      <li class="al-b"><span class="atag atag-b">STEP 1</span>Fill in "New Project Setup" above → downloads a project JSON config to <code>config/</code></li>
+      <li class="al-b"><span class="atag atag-b">STEP 2</span>Drop the project JSON in <code>config/</code> folder alongside <code>oya-project.json</code></li>
+      <li class="al-b"><span class="atag atag-b">STEP 3</span>Select the project from the dropdown (top-right). All tabs load from that config.</li>
+      <li class="al-b"><span class="atag atag-b">STEP 4</span>Add nodes to the Fibre Design tab. Run OTDR calculations. Map the ring.</li>
+      <li class="al-b"><span class="atag atag-b">STEP 5</span>Share WhatsApp report template with field tech. Parse daily via Reports tab.</li>
+      <li class="al-b"><span class="atag atag-b">STEP 6</span>Generate client reports from Reports tab. Export as PDF via Print.</li>
+      <li class="al-g"><span class="atag atag-g">RESULT</span>Full engineering lifecycle: Survey → Design → Build → Test → Commission → Report — in one platform, for any client.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ══════════════════════════ SCRIPTS ══════════════════════════ -->
+<script>
+// ── Clock ──
+setInterval(()=>{
+  const n=new Date();
+  document.getElementById('clock').textContent=n.toLocaleTimeString('en-ZA',{hour12:false});
+},1000);
+
+// ── Tab ──
+function tab(name,el){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.ntab').forEach(t=>t.classList.remove('active'));
+  const p=document.getElementById('t-'+name);
+  if(p) p.classList.add('active');
+  if(el) el.classList.add('active');
+}
+
+// ── Project loader ──
+function loadProject(v){
+  if(v==='new'){tab('projects',null);return;}
+  document.getElementById('proj-select').value=v;
+}
+
+// ══════════════ FIBRE CALCULATORS ══════════════
+
+function calcFibre(){
+  const len=+$('fb-len').value, att=+$('fb-att').value,
+        spl=+$('fb-spl').value, sloss=+$('fb-sloss').value,
+        con=+$('fb-con').value, closs=+$('fb-closs').value,
+        margin=+$('fb-margin').value;
+  const cableLoss=len*att;
+  const spliceLoss=spl*sloss;
+  const connLoss=con*closs;
+  const total=cableLoss+spliceLoss+connLoss;
+  const totalWithMargin=total+margin;
+  const status=total<=totalWithMargin?'PASS':'REVIEW';
+  $('fb-result').innerHTML=`<b style="color:var(--cyan)">FIBRE LOSS BUDGET</b>
+Cable loss:      ${len} km × ${att} dB/km = <b>${cableLoss.toFixed(3)} dB</b>
+Splice loss:     ${spl} × ${sloss} dB     = <b>${spliceLoss.toFixed(3)} dB</b>
+Connector loss:  ${con} × ${closs} dB     = <b>${connLoss.toFixed(3)} dB</b>
+──────────────────────────────────
+Total link loss: <b style="color:${total>5?'#f09090':'#80e0a0'}">${total.toFixed(3)} dB</b>
+Safety margin:   ${margin} dB
+Total (+ margin):<b> ${totalWithMargin.toFixed(3)} dB</b>
+Status:          <b style="color:${status==='PASS'?'var(--green)':'var(--amber)'}">${status}</b>`;
+}
+
+function calcOTDR(){
+  const span=+$('of-span').value, pos=+$('of-pos').value,
+        loss=+$('of-loss').value, refl=+$('of-refl').value,
+        wl=+$('of-wl').value, thr=+$('of-thr').value;
+  const pct=(pos/span*100).toFixed(1);
+  const fromB=(span-pos).toFixed(3);
+  const pass=loss<=thr;
+  const eventType=refl>-35?'Reflective (connector/break)':'Non-reflective (splice/bend)';
+  $('of-result').innerHTML=`<b style="color:var(--cyan)">OTDR EVENT ANALYSIS — ${wl}nm</b>
+Fault position:  <b>${pos} km</b> from A-end (${pct}% along span)
+Distance from B: <b>${fromB} km</b>
+Event loss:      <b style="color:${pass?'var(--green)':'var(--red)'}">${loss} dB</b> (threshold ≤${thr} dB)
+Reflectance:     ${refl} dB → ${eventType}
+──────────────────────────────────
+Result:          <b style="color:${pass?'var(--green)':'var(--red)'}">${pass?'✅ WITHIN BUDGET':'❌ ACTION REQUIRED'}</b>
+Recommendation:  ${pass?'No action needed':'Re-splice or replace connector. Target ≤'+thr+' dB.'}`;
+}
+
+function calcDome(){
+  const num=+$('dj-num').value, spl=+$('dj-spl').value,
+        read=+$('dj-read').value, bud=+$('dj-bud').value,
+        span=+$('dj-span').value, att=+$('dj-atten').value;
+  const totalSpl=num*spl;
+  const totalBudget=num*bud;
+  const spanLoss=span*att;
+  const cableOnly=spanLoss-totalBudget;
+  const cableDbKm=span>0?cableOnly/span:0;
+  const pass=read<=bud;
+  $('dj-result').innerHTML=`<b style="color:var(--cyan)">DOME JOINT BUDGET</b>
+Dome joints:     ${num} × ${spl} splices = <b>${totalSpl} total splices</b>
+Dome budget:     ${num} × ≤${bud} dB = <b>≤${totalBudget.toFixed(2)} dB allowance</b>
+Current reading: <b style="color:${pass?'var(--green)':'var(--red)'}">${read} dB</b>
+──────────────────────────────────
+Apparent span:   ${span} km × ${att} dB/km = ${spanLoss.toFixed(3)} dB
+Less dome allow: ${spanLoss.toFixed(3)} − ${totalBudget.toFixed(2)} = ${cableOnly.toFixed(3)} dB
+Residual cable:  <b>${cableDbKm.toFixed(3)} dB/km</b> ${cableDbKm<=1.0?'✅ COMPLIANT':'❌ EXCEEDS BUDGET'}
+Re-splice req:   <b style="color:${pass?'var(--green)':'var(--amber)'}">${pass?'No — within budget':'YES — re-splice to ≤'+bud+' dB'}</b>`;
+}
+
+// ══════════════ WIRELESS CALCULATORS ══════════════
+
+function fspl(freq_ghz,dist_km){
+  return 20*Math.log10(dist_km)+20*Math.log10(freq_ghz)+92.44;
+}
+
+function calcLink(){
+  const f=+$('lb-freq').value, d=+$('lb-dist').value,
+        tx=+$('lb-tx').value, gain=+$('lb-gain').value,
+        cable=+$('lb-cable').value, sens=+$('lb-sens').value,
+        sym=+$('lb-sym').value, rain=+$('lb-rain').value;
+  const pl=fspl(f,d);
+  const totalGain=gain*sym;
+  const rsl=tx+totalGain-pl-cable*2-rain;
+  const margin=rsl-sens;
+  const pass=margin>=15;
+  $('lb-result').innerHTML=`<b style="color:var(--cyan)">LINK BUDGET — ${f} GHz, ${d} km</b>
+Free space path loss: <b>${pl.toFixed(1)} dB</b>
+Tx power:             ${tx} dBm
+Antenna gain (total): +${totalGain} dBi (${sym===2?'both ends':'one end'})
+Cable loss (both):    −${(cable*2).toFixed(1)} dB
+Rain margin:          −${rain} dB
+──────────────────────────────────
+RSL:                  <b style="color:${rsl>sens+10?'var(--green)':'var(--amber)'}">${rsl.toFixed(1)} dBm</b>
+Rx sensitivity:       ${sens} dBm
+Fade margin:          <b style="color:${pass?'var(--green)':'var(--red)'}">${margin.toFixed(1)} dB</b>
+Status:               <b style="color:${pass?'var(--green)':'var(--red)'}">${pass?'✅ LINK VIABLE (≥15 dB margin)':'❌ INSUFFICIENT MARGIN'}</b>`;
+}
+
+function calcFresnel(){
+  const d=+$('fz-dist').value, f=+$('fz-freq').value,
+        ha=+$('fz-ha').value, hb=+$('fz-hb').value,
+        obs=+$('fz-obs').value, opos=+$('fz-opos').value;
+  const d1=opos, d2=d-opos;
+  const r1=17.3*Math.sqrt((d1*d2)/(f*(d1+d2)));
+  const lof=(ha+(hb-ha)*(d1/d)*1000)/1000;
+  const losHeight=(ha+((hb-ha)*(d1/d)));
+  const clearance=losHeight-obs;
+  const req60=0.6*r1;
+  const pass=clearance>=req60;
+  $('fz-result').innerHTML=`<b style="color:var(--cyan)">FRESNEL ZONE ANALYSIS — ${f} GHz</b>
+1st Fresnel radius at obstacle: <b>${r1.toFixed(1)} m</b>
+60% Fresnel clearance req'd:    <b>${req60.toFixed(1)} m</b>
+Line-of-sight height at obs:    ${losHeight.toFixed(1)} m AGL
+Obstacle height:                ${obs} m AGL
+Actual clearance:               <b style="color:${pass?'var(--green)':'var(--red)'}">${clearance.toFixed(1)} m</b>
+──────────────────────────────────
+Status: <b style="color:${pass?'var(--green)':'var(--red)'}">${pass?'✅ ADEQUATE CLEARANCE':'❌ OBSTACLE IN FRESNEL ZONE — raise antennas'}</b>
+${!pass?'Raise antennas by ≥'+(req60-clearance).toFixed(1)+' m combined':''}`;
+}
+
+function calcAntHeight(){
+  const d=+$('ah-dist').value, f=+$('ah-freq').value,
+        terr=+$('ah-terr').value, k=+$('ah-k').value,
+        obs=+$('ah-obs').value;
+  const r1mid=17.3*Math.sqrt(d/(4*f));
+  const earthBulge=d*d*1000/(12.74*k);
+  const minH=obs+r1mid*0.6+earthBulge+terr;
+  $('ah-result').innerHTML=`<b style="color:var(--cyan)">ANTENNA HEIGHT ESTIMATOR</b>
+Distance:             ${d} km @ ${f} GHz
+Max obstacle:         ${obs} m AGL
+Earth bulge (mid):    ${earthBulge.toFixed(1)} m (k=${k})
+60% Fresnel (mid):    ${r1mid.toFixed(1)} m radius
+Terrain clearance:    ${terr} m
+──────────────────────────────────
+Min antenna height:   <b style="color:var(--cyan)">${minH.toFixed(0)} m AGL</b> (each end, symmetrical)
+Recommendation:       Use ≥<b>${Math.ceil(minH/5)*5} m</b> masts for safe link`;
+}
+
+// ══════════════ iPerf Generator ══════════════
+function genIperf(){
+  const srv=$('ip-srv').value||'<server-ip>';
+  const dur=$('ip-dur').value;
+  const par=$('ip-par').value;
+  const proto=$('ip-proto').value;
+  const intv=$('ip-int').value;
+  const port=$('ip-port').value;
+  $('ip-server-cmd').textContent=`iperf3 -s -p ${port}`;
+  $('ip-client-cmd').textContent=`iperf3 -c ${srv} -p ${port} -t ${dur} -P ${par} -i ${intv}${proto?' '+proto:''}`;
+}
+
+// ══════════════ SPEED LOG ══════════════
+let speedLog=JSON.parse(localStorage.getItem('cttx-speedlog')||'[]');
+function logSpeed(){
+  const entry={
+    dt:$('st-dt').value||new Date().toISOString().slice(0,16),
+    name:$('st-name').value||'—',
+    type:$('st-type').value,
+    dl:parseFloat($('st-dl').value)||0,
+    ul:parseFloat($('st-ul').value)||0,
+    lat:parseFloat($('st-lat').value)||0,
+    jit:parseFloat($('st-jit').value)||0,
+    loss:parseFloat($('st-loss').value)||0,
+    sla:parseFloat($('st-sla').value)||100,
+    tool:$('st-tool').value
+  };
+  speedLog.unshift(entry);
+  localStorage.setItem('cttx-speedlog',JSON.stringify(speedLog));
+  renderSpeedLog();
+  updateSpeedKPIs();
+}
+function clearSpeedLog(){speedLog=[];localStorage.removeItem('cttx-speedlog');renderSpeedLog();updateSpeedKPIs();}
+function renderSpeedLog(){
+  const tb=document.getElementById('speed-log');
+  if(!speedLog.length){tb.innerHTML='<tr><td colspan="11" style="color:var(--muted);text-align:center;padding:20px;">No tests logged yet</td></tr>';return;}
+  tb.innerHTML=speedLog.map(e=>{
+    const pass=e.dl>=e.sla*0.9&&e.loss<1;
+    return `<tr>
+      <td>${e.dt}</td><td>${e.name}</td><td>${e.type}</td>
+      <td style="color:${e.dl>=e.sla*0.9?'var(--green)':'var(--red)'};font-weight:700">${e.dl}</td>
+      <td>${e.ul}</td>
+      <td style="color:${e.lat<10?'var(--green)':e.lat<50?'var(--amber)':'var(--red)'}">${e.lat}</td>
+      <td>${e.jit}</td>
+      <td style="color:${e.loss===0?'var(--green)':'var(--red)'}">${e.loss}%</td>
+      <td>${e.sla} Mbps</td><td>${e.tool}</td>
+      <td><span class="chip ${pass?'ch-g':'ch-r'}">${pass?'✅ PASS':'❌ FAIL'}</span></td>
+    </tr>`;
+  }).join('');
+}
+function updateSpeedKPIs(){
+  if(!speedLog.length){['lm-total','lm-dl','lm-ul','lm-lat'].forEach(i=>document.getElementById(i).textContent='—');return;}
+  document.getElementById('lm-total').textContent=speedLog.length;
+  document.getElementById('lm-dl').textContent=(speedLog.reduce((a,e)=>a+e.dl,0)/speedLog.length).toFixed(0);
+  document.getElementById('lm-ul').textContent=(speedLog.reduce((a,e)=>a+e.ul,0)/speedLog.length).toFixed(0);
+  document.getElementById('lm-lat').textContent=(speedLog.reduce((a,e)=>a+e.lat,0)/speedLog.length).toFixed(1);
+}
+
+// ══════════════ SURVEY ══════════════
+const CHECKLIST=[
+  'Site access confirmed & safety briefing done',
+  'GPS coordinates recorded',
+  'Cable route walked & marked',
+  'Duct / conduit inspected',
+  'Splice tray installed & labelled',
+  'Cable pulled & secured',
+  'Buffer tubes stripped & fibres cleaned',
+  'All splices made (mainline + RMU + MM if applicable)',
+  'OTDR test performed (both directions)',
+  'Connectors cleaned & tested with power meter',
+  'Patch leads connected & labelled',
+  'Cabinet / enclosure closed & weatherproofed',
+  'Drawing updated with as-built markings',
+  'Photos taken & labelled',
+  'Report submitted to PM',
+];
+function renderChecklist(){
+  document.getElementById('checklist-items').innerHTML=CHECKLIST.map((item,i)=>`
+    <label style="display:flex;align-items:center;gap:9px;padding:6px 0;border-bottom:1px solid #0a1a2e;font-size:11.5px;cursor:pointer;">
+      <input type="checkbox" id="chk-${i}" onchange="scoreChk()" style="accent-color:var(--cyan);width:14px;height:14px;">
+      <span>${item}</span>
+    </label>`).join('');
+}
+function scoreChk(){
+  const done=CHECKLIST.filter((_,i)=>document.getElementById('chk-'+i)?.checked).length;
+  const pct=Math.round(done/CHECKLIST.length*100);
+  document.getElementById('chk-score').innerHTML=`<b style="color:${pct===100?'var(--green)':pct>60?'var(--amber)':'var(--red)'}">${done}/${CHECKLIST.length} items (${pct}%)</b> — ${pct===100?'✅ Site complete':'Continue checklist...'}`;
+}
+function checkAll(){CHECKLIST.forEach((_,i)=>{const c=document.getElementById('chk-'+i);if(c)c.checked=true;});scoreChk();}
+function uncheckAll(){CHECKLIST.forEach((_,i)=>{const c=document.getElementById('chk-'+i);if(c)c.checked=false;});scoreChk();}
+
+function saveSurvey(){
+  const d={
+    id:$('sv-id').value,date:$('sv-date').value,lat:$('sv-lat').value,lon:$('sv-lon').value,
+    type:$('sv-type').value,tech:$('sv-tech').value,notes:$('sv-notes').value,
+    tray:$('sv-tray').value,cable:$('sv-cable').value,labels:$('sv-labels').value,
+    photos:$('sv-photos').value,drawing:$('sv-drawing').value
+  };
+  const out=document.getElementById('sv-out');
+  out.style.display='block';
+  out.textContent=`✅ SURVEY SAVED — ${d.id}\n───────────────────────────\nDate:    ${d.date}\nGPS:     ${d.lat}, ${d.lon}\nType:    ${d.type}\nTech:    ${d.tech}\nTray:    ${d.tray} | Cable: ${d.cable} | Labels: ${d.labels}\nPhotos:  ${d.photos} | Drawing: ${d.drawing}\nNotes:   ${d.notes||'—'}\n───────────────────────────\n→ Use /parse-site-report in Claude Code to log in tracker`;
+}
+function clearSurvey(){['sv-id','sv-date','sv-lat','sv-lon','sv-tech','sv-notes'].forEach(id=>$(id).value='');document.getElementById('sv-out').style.display='none';}
+
+// ══════════════ REPORT PARSER ══════════════
+function parseWhatsApp(){
+  const raw=document.getElementById('rp-input').value.trim();
+  if(!raw)return;
+  const get=(key)=>{
+    const r=new RegExp(key+':?\\s*(.+)','i');
+    const m=raw.match(r);
+    return m?m[1].trim():'—';
+  };
+  const out=document.getElementById('rp-out');
+  out.style.display='block';
+  out.textContent=`✅ PARSED FIELD REPORT
+───────────────────────────────────
+Turbine:     ${get('TURBINE(\\s+NUMBER)?')}
+Date:        ${get('DATE')}
+Splices:     ${get('SPLICES COMPLETED(\\s+TODAY)?')}
+RMU:         ${get('RMU COMPLETED')}
+Mate/Mask:   ${get('MATE.?MASK COMPLETED')}
+Tested:      ${get('TOTAL SPLICES.*TESTED')}
+Drawing:     ${get('MARKED ON DRAWING')}
+AC→LC:       ${get('AC.*LC.*CHANGES')}
+Challenges:  ${get('CHALLENGES.*DELAYS')}
+Photos:      ${get('PHOTOS ATTACHED')}
+───────────────────────────────────
+→ Update data/progress.json with above values
+→ Run /parse-site-report in Claude Code to auto-update`;
+}
+
+// ══════════════ REPORT GENERATOR ══════════════
+function genReport(){
+  const type=$('rg-type').value, date=$('rg-date').value||new Date().toISOString().slice(0,10),
+        client=$('rg-client').value, ref=$('rg-ref').value, summary=$('rg-summary').value;
+  const out=document.getElementById('rg-out');
+  out.style.display='block';
+  out.textContent=`${type.toUpperCase()}
+${'═'.repeat(50)}
+Ref:     ${ref}
+Date:    ${date}
+Client:  ${client}
+Prepared by: CTTX Services
+
+EXECUTIVE SUMMARY
+─────────────────
+${summary||'(No summary provided)'}
+
+PROJECT: OYA Wind Farm — Fibre Optic Ring
+Drawing: ZA-OYA0-EN-EL-CC-9526 Rev 7
+Cable:   G.652D Singlemode, 24-core ring
+
+STATUS SUMMARY
+─────────────
+✅ 18/18 nodes — CTTX termination PASS
+✅ 272 RC→LC mid-coupler replacements done
+⚠  Ring-close dome re-splice required (WTG-08↔10)
+🔴 5 client cable span faults — awaiting client action
+📋 Bottom arm span distances — OTDR measurement pending
+
+→ Copy to Word/PDF for client issue
+→ All OTDR results available in data/otdr-results.json`;
+}
+
+// ══════════════ CERT GENERATOR ══════════════
+function genCert(){
+  const d=new Date().toLocaleDateString('en-ZA');
+  const out=document.getElementById('tc-out');
+  out.style.display='block';
+  out.innerHTML=`<div class="result-box" style="margin-top:10px;">COMMISSIONING TEST CERTIFICATE
+${'═'.repeat(50)}
+Project:    ${$('tc-ref').value}
+Drawing:    ${$('tc-draw').value}
+Client:     ${$('tc-client').value}
+Test date:  ${$('tc-date').value||d}
+Instrument: ${$('tc-inst').value}
+Wavelength: ${$('tc-wl').value} nm | Fibre: G.652D SM
+
+RESULT: All CTTX-scope nodes PASS (≤1.20 dB budget)
+Pending: Dome re-splice + client cable faults
+
+Tested by:   ${$('tc-tech').value}
+Approved by: ${$('tc-pm').value}
+Date:        ${d}
+
+Signature: ________________   ________________</div>`;
+}
+
+// ══════════════ PROJECT CREATOR ══════════════
+function createProject(){
+  const c=$('np-client').value, n=$('np-name').value;
+  if(!c||!n){alert('Please enter client name and project name.');return;}
+  const cfg={
+    project:{id:`CTTX-${c.substring(0,4).toUpperCase()}-${new Date().getFullYear()}-01`,name:n,client:c,
+      location:$('np-loc').value,type:$('np-type').value,status:'active',
+      start_date:$('np-start').value,ref_drawing:$('np-draw').value,
+      cttx_ref:$('np-ref').value,lead_tech:$('np-tech').value},
+    fibre:{cable_type:$('np-cable').value,core_count:24,topology:'ring',node_budget_db:1.20,span_budget_db_per_km:1.00},
+    wireless:{links:[]},nodes:[],team:[]
+  };
+  const out=document.getElementById('np-out');
+  out.style.display='block';
+  out.textContent=`✅ PROJECT CONFIG CREATED\n───────────────────────────\n${JSON.stringify(cfg,null,2)}\n───────────────────────────\n→ Save above JSON to config/${c.toLowerCase().replace(/\s+/g,'-')}-project.json\n→ Select from project dropdown to activate`;
+}
+
+// ══════════════ WIRELESS LINK TABLE ══════════════
+let links=[];
+function addLink(){
+  const f=+$('lb-freq').value||5.8, d=+$('lb-dist').value||1,
+        tx=+$('lb-tx').value||20, gain=+$('lb-gain').value||23,
+        cable=+$('lb-cable').value||1.5, sens=+$('lb-sens').value||-80;
+  const pl=fspl(f,d);
+  const rsl=tx+(gain*2)-pl-(cable*2);
+  const margin=rsl-sens;
+  const r1=17.3*Math.sqrt(d/(4*f));
+  links.push({id:'LINK-'+String(links.length+1).padStart(2,'0'),name:`Site A↔B ${links.length+1}`,f,d,pl,tx,gain,rsl,margin,r1});
+  renderLinks();
+}
+function clearLinks(){links=[];renderLinks();}
+function renderLinks(){
+  document.getElementById('link-tbl-body').innerHTML=links.map(l=>`<tr>
+    <td>${l.id}</td><td>${l.name}</td><td>${l.f}</td><td>${l.d}</td>
+    <td>${l.pl.toFixed(1)}</td><td>${l.tx}</td><td>${l.gain}</td>
+    <td style="color:${l.rsl>l.sens+15?'var(--green)':'var(--amber)'};font-weight:700">${l.rsl.toFixed(1)}</td>
+    <td style="color:${l.margin>=15?'var(--green)':'var(--red)';font-weight:700}">${l.margin.toFixed(1)}</td>
+    <td>${l.r1.toFixed(1)}</td>
+    <td><span class="chip ${l.margin>=15?'ch-g':'ch-r'}">${l.margin>=15?'VIABLE':'CHECK'}</span></td>
+  </tr>`).join('');
+}
+
+// ── Helper ──
+function $(id){return document.getElementById(id);}
+
+// ── Init ──
+window.onload=()=>{
+  calcFibre();calcOTDR();calcDome();
+  calcLink();calcFresnel();calcAntHeight();
+  genIperf();
+  renderChecklist();scoreChk();
+  renderSpeedLog();updateSpeedKPIs();
+  // set datetime defaults
+  const now=new Date().toISOString().slice(0,16);
+  const el=$('st-dt');if(el)el.value=now;
+  const d=new Date().toISOString().slice(0,10);
+  ['sv-date','rg-date','tc-date','np-start'].forEach(id=>{const e=$(id);if(e)e.value=d;});
+};
+</script>
+</body>
+</html>

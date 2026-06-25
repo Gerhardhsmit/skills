@@ -1,0 +1,51 @@
+{
+  "project": {
+    "id": "CTTX-OYA-2026-01",
+    "name": "OYA Wind Farm — Fibre Optic Ring",
+    "client": "OYA / SpecAfrica",
+    "location": "OYA Wind Farm, South Africa",
+    "type": "fibre_ring",
+    "status": "active",
+    "start_date": "2026-05-01",
+    "target_date": "2026-07-31",
+    "ref_drawing": "ZA-OYA0-EN-EL-CC-9526 Rev 7",
+    "cttx_ref": "CTTX-OYA-OTDR-2026-01",
+    "pm": "Gerhard",
+    "lead_tech": "Freddie Mackay"
+  },
+  "fibre": {
+    "cable_type": "G.652D",
+    "core_count": 24,
+    "topology": "ring",
+    "node_budget_db": 1.20,
+    "span_budget_db_per_km": 1.00,
+    "wavelength_nm": 1310,
+    "connector_type": "LC/APC",
+    "splice_budget_db": 0.10,
+    "nodes": [
+      {"id":"WTG-01","label":"WTG 01","arm":1,"code":"CLIENT_CABLE","nodeLoss":1.649,"spanDbKm":2.567,"rmu":false,"mm":false},
+      {"id":"WTG-02","label":"WTG 02","arm":1,"code":"CLIENT_CABLE","nodeLoss":0.179,"spanDbKm":3.861,"rmu":false,"mm":false},
+      {"id":"WTG-03","label":"WTG 03","arm":1,"code":"CLIENT_CABLE","nodeLoss":0.318,"spanDbKm":1.103,"rmu":true,"mm":true},
+      {"id":"WTG-04","label":"WTG 04","arm":1,"code":"PASS","nodeLoss":0,"spanDbKm":0.390,"rmu":false,"mm":false},
+      {"id":"WTG-05","label":"WTG 05","arm":1,"code":"PASS","nodeLoss":0,"spanDbKm":0.599,"rmu":true,"mm":false},
+      {"id":"WTG-06","label":"WTG 06","arm":1,"code":"PASS","nodeLoss":0,"spanDbKm":0.870,"rmu":false,"mm":false},
+      {"id":"WTG-07","label":"WTG 07","arm":1,"code":"CLIENT_CABLE","nodeLoss":0.600,"spanDbKm":1.112,"rmu":true,"mm":false},
+      {"id":"WTG-08","label":"WTG 08","arm":1,"code":"PASS","nodeLoss":0,"spanDbKm":0.746,"rmu":false,"mm":false},
+      {"id":"WTG-09","label":"WTG 09","arm":2,"code":"CLIENT_CABLE","nodeLoss":0.703,"spanDbKm":14.355,"rmu":false,"mm":true},
+      {"id":"WTG-10","label":"WTG 10","arm":2,"code":"CLIENT_CABLE","nodeLoss":1.218,"spanDbKm":6.762,"rmu":true,"mm":false},
+      {"id":"WTG-11","label":"WTG 11","arm":2,"code":"PASS","nodeLoss":0.330,"spanDbKm":0.701,"rmu":true,"mm":false},
+      {"id":"WTG-12","label":"WTG 12","arm":2,"code":"PASS","nodeLoss":0.586,"spanDbKm":0.624,"rmu":true,"mm":false},
+      {"id":"WTG-13","label":"WTG 13","arm":2,"code":"PASS","nodeLoss":0.118,"spanDbKm":0.414,"rmu":false,"mm":false},
+      {"id":"WTG-14","label":"WTG 14","arm":2,"code":"CLIENT_CABLE","nodeLoss":1.043,"spanDbKm":1.134,"rmu":true,"mm":false},
+      {"id":"WTG-15","label":"WTG 15","arm":2,"code":"PASS","nodeLoss":0.577,"spanDbKm":0.626,"rmu":true,"mm":false},
+      {"id":"WTG-16","label":"WTG 16","arm":2,"code":"PASS","nodeLoss":0.664,"spanDbKm":0.583,"rmu":true,"mm":false},
+      {"id":"WTG-17","label":"WTG 17","arm":2,"code":"CLIENT_CABLE","nodeLoss":0.584,"spanDbKm":1.783,"rmu":true,"mm":false},
+      {"id":"WTG-18","label":"WTG 18","arm":2,"code":"PASS","nodeLoss":0.171,"spanDbKm":0.751,"rmu":false,"mm":false}
+    ]
+  },
+  "wireless": { "links": [] },
+  "team": [
+    {"name":"Freddie Mackay","role":"Lead Splicer","phone":""},
+    {"name":"Gerhard","role":"Project Manager","phone":""}
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "_template": "CTTX Smart Engineering Platform — Project Config v1.0",
+  "_instructions": "Copy this file to config/project-CLIENTNAME.json and fill in. Load via the Projects tab.",
+  "project": {
+    "id": "PROJ-001",
+    "name": "Project Name",
+    "client": "Client Name",
+    "location": "Site Location, Country",
+    "type": "fibre_ring",
+    "status": "active",
+    "start_date": "YYYY-MM-DD",
+    "target_date": "YYYY-MM-DD",
+    "ref_drawing": "Drawing Ref Rev X",
+    "cttx_ref": "CTTX-CLIENT-TYPE-YEAR-NN",
+    "pm": "Project Manager Name",
+    "lead_tech": "Lead Technician Name"
+  },
+  "fibre": {
+    "cable_type": "G.652D",
+    "core_count": 24,
+    "topology": "ring",
+    "node_budget_db": 1.20,
+    "span_budget_db_per_km": 1.00,
+    "wavelength_nm": 1310,
+    "connector_type": "LC/APC",
+    "splice_budget_db": 0.10,
+    "nodes": [
+      { "id": "NODE-01", "label": "Node 01", "type": "wtg", "rmu": false, "mm": false }
+    ]
+  },
+  "wireless": {
+    "links": [
+      {
+        "id": "LINK-01",
+        "name": "Site A to Site B",
+        "frequency_ghz": 5.8,
+        "tx_power_dbm": 20,
+        "antenna_gain_dbi": 23,
+        "distance_km": 2.5,
+        "antenna_height_a_m": 30,
+        "antenna_height_b_m": 30
+      }
+    ]
+  },
+  "nodes": [],
+  "team": [
+    { "name": "Technician Name", "role": "Splicer", "phone": "+27XX XXX XXXX" }
+  ],
+  "report_template": "standard_fibre"
+}
