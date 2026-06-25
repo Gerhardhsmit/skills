@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CTTX Cockpit — Control Panel</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#0a1628;color:#e0e8f0;min-height:100vh;overflow-x:hidden;}
+
+/* TOP BAR */
+.topbar{display:flex;align-items:center;justify-content:space-between;background:#0D2E5C;padding:0 24px;height:54px;border-bottom:2px solid #1a4a8a;position:sticky;top:0;z-index:100;}
+.topbar-logo{display:flex;align-items:center;gap:12px;}
+.topbar-logo .logo-mark{width:34px;height:34px;background:linear-gradient(135deg,#1a6bbf,#00c6ff);border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;color:#fff;letter-spacing:-0.5px;}
+.topbar-logo h1{font-size:16px;font-weight:700;color:#fff;letter-spacing:0.5px;}
+.topbar-logo span{font-size:10px;color:#7aaad4;display:block;margin-top:-2px;}
+.topbar-right{display:flex;align-items:center;gap:18px;font-size:11px;color:#7aaad4;}
+.status-pill{background:#1a3a5c;border:1px solid #2a5a8a;border-radius:20px;padding:4px 12px;display:flex;align-items:center;gap:6px;}
+.dot{width:7px;height:7px;border-radius:50%;}
+.dot.green{background:#2ecc71;box-shadow:0 0 6px #2ecc71;}
+.dot.amber{background:#f39c12;box-shadow:0 0 6px #f39c12;}
+.dot.red{background:#e74c3c;box-shadow:0 0 6px #e74c3c;}
+.clock{font-size:13px;color:#a0c4e8;font-weight:600;font-variant-numeric:tabular-nums;}
+
+/* NAV TABS */
+.nav{background:#071220;border-bottom:1px solid #1a3a5c;display:flex;overflow-x:auto;scrollbar-width:none;}
+.nav::-webkit-scrollbar{display:none;}
+.nav-tab{padding:14px 22px;font-size:12px;font-weight:600;color:#5a8ab0;cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;transition:all .2s;letter-spacing:0.4px;display:flex;align-items:center;gap:7px;}
+.nav-tab:hover{color:#a0c8e8;background:rgba(255,255,255,0.03);}
+.nav-tab.active{color:#00c6ff;border-bottom-color:#00c6ff;background:rgba(0,198,255,0.06);}
+.nav-tab .tab-icon{font-size:14px;}
+
+/* PANELS */
+.panel{display:none;padding:20px 24px;animation:fadeIn .2s ease;}
+.panel.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+
+/* GRID */
+.grid{display:grid;gap:16px;}
+.grid-2{grid-template-columns:1fr 1fr;}
+.grid-3{grid-template-columns:1fr 1fr 1fr;}
+.grid-4{grid-template-columns:repeat(4,1fr);}
+@media(max-width:900px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr 1fr;}}
+@media(max-width:600px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr;}}
+
+/* CARDS */
+.card{background:#0e1f38;border:1px solid #1a3a5c;border-radius:10px;padding:18px 20px;}
+.card-title{font-size:10px;font-weight:700;color:#5a8ab0;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+.card-title .icon{font-size:13px;}
+
+/* KPI CARDS */
+.kpi{background:linear-gradient(135deg,#0e1f38,#0a1628);border:1px solid #1a3a5c;border-radius:10px;padding:18px 20px;position:relative;overflow:hidden;}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.kpi.blue::before{background:linear-gradient(90deg,#1a6bbf,#00c6ff);}
+.kpi.green::before{background:linear-gradient(90deg,#1a7a4a,#2ecc71);}
+.kpi.amber::before{background:linear-gradient(90deg,#8a5a00,#f39c12);}
+.kpi.red::before{background:linear-gradient(90deg,#7a1a1a,#e74c3c);}
+.kpi.purple::before{background:linear-gradient(90deg,#5a1a8a,#9b59b6);}
+.kpi-label{font-size:10px;color:#5a8ab0;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;}
+.kpi-value{font-size:28px;font-weight:800;color:#e0f0ff;line-height:1;}
+.kpi-sub{font-size:11px;color:#4a7a9a;margin-top:6px;}
+.kpi-badge{position:absolute;top:14px;right:14px;font-size:20px;opacity:0.3;}
+
+/* ACTION ITEMS */
+.action-list{list-style:none;}
+.action-list li{padding:10px 12px;border-radius:6px;margin-bottom:6px;font-size:12px;display:flex;align-items:flex-start;gap:10px;background:#071a30;border-left:3px solid;}
+.action-list li.warn{border-color:#f39c12;color:#f0c060;}
+.action-list li.danger{border-color:#e74c3c;color:#f08080;}
+.action-list li.info{border-color:#3498db;color:#80c0f0;}
+.action-list li.ok{border-color:#2ecc71;color:#80e0a0;}
+.action-tag{font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px;white-space:nowrap;flex-shrink:0;margin-top:1px;}
+.action-tag.warn{background:#7a4a00;color:#f0c060;}
+.action-tag.danger{background:#6a1a1a;color:#f08080;}
+.action-tag.info{background:#1a3a6a;color:#80c0f0;}
+.action-tag.ok{background:#1a4a2a;color:#80e0a0;}
+
+/* PROGRESS TABLE */
+.data-table{width:100%;border-collapse:collapse;font-size:11.5px;}
+.data-table th{text-align:left;padding:8px 10px;font-size:10px;font-weight:700;color:#4a7a9a;text-transform:uppercase;letter-spacing:0.6px;border-bottom:1px solid #1a3a5c;}
+.data-table td{padding:9px 10px;border-bottom:1px solid #0e2040;color:#c0d8f0;vertical-align:middle;}
+.data-table tr:hover td{background:rgba(0,198,255,0.04);}
+.status-chip{font-size:10px;font-weight:700;padding:3px 8px;border-radius:12px;white-space:nowrap;}
+.chip-pass{background:#1a3a1a;color:#2ecc71;border:1px solid #2a5a2a;}
+.chip-warn{background:#3a2a00;color:#f39c12;border:1px solid #5a4000;}
+.chip-fail{background:#3a0a0a;color:#e74c3c;border:1px solid #5a1a1a;}
+.chip-none{background:#1a2a3a;color:#5a8ab0;border:1px solid #2a3a4a;}
+.chip-client{background:#0a2040;color:#5a9ad0;border:1px solid #1a3a5a;}
+
+/* PROGRESS BAR */
+.pbar-wrap{background:#0a1628;border-radius:4px;height:6px;overflow:hidden;margin-top:4px;}
+.pbar{height:100%;border-radius:4px;transition:width .5s;}
+.pbar.green{background:linear-gradient(90deg,#1a7a4a,#2ecc71);}
+.pbar.amber{background:linear-gradient(90deg,#8a5a00,#f39c12);}
+.pbar.red{background:linear-gradient(90deg,#7a1a1a,#e74c3c);}
+.pbar.blue{background:linear-gradient(90deg,#1a4a8a,#00c6ff);}
+
+/* SECTION HEADERS */
+.section-header{font-size:13px;font-weight:700;color:#a0c8e8;margin:20px 0 12px;display:flex;align-items:center;gap:8px;padding-bottom:8px;border-bottom:1px solid #1a3a5c;}
+.section-header::before{content:'';width:4px;height:18px;background:linear-gradient(180deg,#1a6bbf,#00c6ff);border-radius:2px;display:inline-block;}
+
+/* DIAGRAM FRAME */
+.diagram-wrap{background:#fff;border-radius:8px;overflow:hidden;border:2px solid #1a3a5c;}
+.diagram-wrap iframe{width:100%;border:none;display:block;}
+
+/* PLACEHOLDER */
+.placeholder{background:#071a30;border:2px dashed #1a3a5c;border-radius:10px;padding:48px 24px;text-align:center;color:#4a7a9a;}
+.placeholder .ph-icon{font-size:48px;margin-bottom:16px;opacity:0.4;}
+.placeholder h3{font-size:14px;font-weight:700;color:#6a9ab0;margin-bottom:8px;}
+.placeholder p{font-size:12px;line-height:1.7;max-width:420px;margin:0 auto 16px;}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:none;text-decoration:none;transition:all .2s;}
+.btn-primary{background:linear-gradient(135deg,#1a6bbf,#00c6ff);color:#fff;}
+.btn-primary:hover{opacity:0.85;}
+.btn-secondary{background:#1a3a5c;color:#a0c8e8;border:1px solid #2a5a8a;}
+.btn-secondary:hover{background:#2a4a6c;}
+
+/* METRIC ROW */
+.metric-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #0e2040;font-size:12px;}
+.metric-row:last-child{border:none;}
+.metric-label{color:#6a9ab0;}
+.metric-value{font-weight:700;color:#c0d8f0;}
+
+/* TIMELINE */
+.timeline{list-style:none;}
+.timeline li{display:flex;gap:14px;padding:10px 0;border-bottom:1px solid #0e2040;font-size:12px;}
+.timeline li:last-child{border:none;}
+.tl-date{color:#4a7a9a;min-width:80px;font-variant-numeric:tabular-nums;}
+.tl-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:3px;}
+.tl-content{color:#b0cce0;}
+
+/* ALERT BANNER */
+.alert-banner{background:linear-gradient(135deg,#3a1a00,#5a2a00);border:1px solid #f39c12;border-radius:8px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:12px;font-size:12px;color:#f0c060;}
+.alert-banner .alert-icon{font-size:18px;flex-shrink:0;}
+
+/* SCOPE BADGE */
+.scope-badge{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;padding:3px 8px;border-radius:3px;text-transform:uppercase;}
+.scope-cttx{background:#1a3a6a;color:#5aaaf0;}
+.scope-client{background:#2a1a00;color:#c07000;}
+
+/* SCROLL */
+.scroll-x{overflow-x:auto;}
+.scroll-x::-webkit-scrollbar{height:4px;}
+.scroll-x::-webkit-scrollbar-track{background:#071220;}
+.scroll-x::-webkit-scrollbar-thumb{background:#2a4a6a;border-radius:2px;}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-logo">
+    <div class="logo-mark">CX</div>
+    <div>
+      <h1>CTTX COCKPIT</h1>
+      <span>Business Control Panel — v1.0</span>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="status-pill"><div class="dot green"></div>SYSTEMS LIVE</div>
+    <div class="status-pill"><div class="dot amber"></div>2 ACTIONS OPEN</div>
+    <div class="clock" id="clock">--:--:--</div>
+  </div>
+</div>
+
+<!-- NAV TABS -->
+<nav class="nav">
+  <div class="nav-tab active" onclick="switchTab('cockpit',this)"><span class="tab-icon">🏠</span>COCKPIT</div>
+  <div class="nav-tab" onclick="switchTab('wind',this)"><span class="tab-icon">📡</span>FIBRE WIND FARM</div>
+  <div class="nav-tab" onclick="switchTab('ring',this)"><span class="tab-icon">🔭</span>RING DIAGRAM</div>
+  <div class="nav-tab" onclick="switchTab('reports',this)"><span class="tab-icon">📋</span>FIELD REPORTS</div>
+  <div class="nav-tab" onclick="switchTab('infra',this)"><span class="tab-icon">🧠</span>INFRASTRUCTURE</div>
+  <div class="nav-tab" onclick="switchTab('website',this)"><span class="tab-icon">🌐</span>WEBSITE</div>
+</nav>
+
+<!-- ═══════════════════════════════════════════════
+     TAB 1: COCKPIT
+═══════════════════════════════════════════════ -->
+<div id="tab-cockpit" class="panel active">
+
+  <div class="alert-banner">
+    <span class="alert-icon">⚠</span>
+    <div><b>ACTION REQUIRED:</b> WTG-08↔WTG-10 ring-close dome joints — re-splice 36 cores, 1.155 dB reading. Submit OTDR results to SpecAfrica. &nbsp;|&nbsp; WTG-01 OVH cable client fault pending repair before CTTX re-splice.</div>
+  </div>
+
+  <div class="grid grid-4" style="margin-bottom:16px;">
+    <div class="kpi blue">
+      <div class="kpi-badge">📡</div>
+      <div class="kpi-label">Active Projects</div>
+      <div class="kpi-value">1</div>
+      <div class="kpi-sub">OYA Wind Farm — Fibre Ring</div>
+    </div>
+    <div class="kpi green">
+      <div class="kpi-badge">✅</div>
+      <div class="kpi-label">Nodes CTTX Compliant</div>
+      <div class="kpi-value">18<span style="font-size:14px;color:#4a9a6a">/18</span></div>
+      <div class="kpi-sub">All terminations pass</div>
+    </div>
+    <div class="kpi amber">
+      <div class="kpi-badge">⚡</div>
+      <div class="kpi-label">Open Action Items</div>
+      <div class="kpi-value">2</div>
+      <div class="kpi-sub">Dome re-splice + OVH cable</div>
+    </div>
+    <div class="kpi purple">
+      <div class="kpi-badge">🔌</div>
+      <div class="kpi-label">RC→LC Replacements</div>
+      <div class="kpi-value">272</div>
+      <div class="kpi-sub">Mid-couplers completed</div>
+    </div>
+  </div>
+
+  <div class="grid grid-2" style="margin-bottom:16px;">
+    <div class="card">
+      <div class="card-title"><span class="icon">📡</span>FIBRE WIND FARM — RING STATUS</div>
+      <div class="metric-row"><span class="metric-label">Ring topology</span><span class="metric-value">G.652D Singlemode, 24-core</span></div>
+      <div class="metric-row"><span class="metric-label">Ring Arm 1 (WTG-01→08)</span><span class="metric-value" style="color:#2ecc71">✅ All nodes pass</span></div>
+      <div class="metric-row"><span class="metric-label">Ring Arm 2 (WTG-09→10)</span><span class="metric-value" style="color:#2ecc71">✅ All nodes pass</span></div>
+      <div class="metric-row"><span class="metric-label">Ring close (WTG-08↔10)</span><span class="metric-value" style="color:#f39c12">⚠ Dome re-splice req'd</span></div>
+      <div class="metric-row"><span class="metric-label">Cable break repair joint</span><span class="metric-value" style="color:#e74c3c">🔴 1.155 dB → ≤0.50 dB</span></div>
+      <div class="metric-row"><span class="metric-label">Client cable faults (spans)</span><span class="metric-value" style="color:#5aaaf0">5 spans — client action</span></div>
+      <div style="margin-top:14px;">
+        <div style="font-size:10px;color:#4a7a9a;margin-bottom:4px;">OVERALL PROJECT COMPLETION</div>
+        <div class="pbar-wrap" style="height:10px;">
+          <div class="pbar blue" style="width:78%"></div>
+        </div>
+        <div style="font-size:11px;color:#6a9ab0;margin-top:4px;">78% — OTDR testing + dome re-splice outstanding</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">⚡</span>OPEN ACTION ITEMS</div>
+      <ul class="action-list">
+        <li class="danger">
+          <span class="action-tag danger">CTTX</span>
+          Re-splice ring-close dome joints (WTG-08↔10). 36 cores, target ≤0.10 dB/core. OTDR all results → SpecAfrica.
+        </li>
+        <li class="warn">
+          <span class="action-tag warn">CLIENT</span>
+          OVH_14 overhead cable fault on WTG-01 entry span. 12.9 dB loss. Client to repair before CTTX re-splice.
+        </li>
+        <li class="warn">
+          <span class="action-tag warn">CLIENT</span>
+          WTG-01↔02, 02↔03, 06↔07, 15↔17, 16↔14 cable spans — physical faults in client buried cables. Client investigation required.
+        </li>
+        <li class="info">
+          <span class="action-tag info">PENDING</span>
+          Bottom arm span distances TBC — OTDR fibre length measurements required (WTG-09↔11, 11↔13, 13↔15, 18↔16, 14↔12).
+        </li>
+        <li class="ok">
+          <span class="action-tag ok">DONE</span>
+          272 RC→LC mid-coupler replacements completed. Met Mast 1 (WTG-03) &amp; Met Mast 2 (WTG-09) field-verified.
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="grid grid-3">
+    <div class="card">
+      <div class="card-title"><span class="icon">🏗</span>SYSTEMS ONLINE</div>
+      <ul class="action-list">
+        <li class="ok"><span class="action-tag ok">LIVE</span>Fibre Wind Farm tracker — progress.json</li>
+        <li class="ok"><span class="action-tag ok">LIVE</span>OTDR Ring Diagram — Rev 7 (interactive HTML)</li>
+        <li class="ok"><span class="action-tag ok">LIVE</span>Field report parser — WhatsApp → JSON</li>
+        <li class="info"><span class="action-tag info">DEV</span>Infrastructure Intelligence (TypeScript)</li>
+        <li class="info"><span class="action-tag info">DEV</span>CTTX Services Website</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="icon">📊</span>SPLICING PROGRESS</div>
+      <div class="metric-row"><span class="metric-label">Total splices logged</span><span class="metric-value">100</span></div>
+      <div class="metric-row"><span class="metric-label">AC→LC changes done</span><span class="metric-value">34</span></div>
+      <div class="metric-row"><span class="metric-label">WTGs with activity</span><span class="metric-value">4 / 18</span></div>
+      <div class="metric-row"><span class="metric-label">Fully tested &amp; complete</span><span class="metric-value" style="color:#e74c3c">0 / 18</span></div>
+      <div class="metric-row"><span class="metric-label">Last report received</span><span class="metric-value">16 Jun 2026</span></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="icon">📅</span>RECENT ACTIVITY</div>
+      <ul class="timeline">
+        <li><span class="tl-date">23 Jun 26</span><div class="tl-dot" style="background:#00c6ff"></div><span class="tl-content">OTDR ring diagram Rev 7 saved — all 18 nodes mapped</span></li>
+        <li><span class="tl-date">16 Jun 26</span><div class="tl-dot" style="background:#2ecc71"></div><span class="tl-content">WTG-08 splicing complete — 24 cores, 12 AC→LC</span></li>
+        <li><span class="tl-date">10 Jun 26</span><div class="tl-dot" style="background:#2ecc71"></div><span class="tl-content">WTG-07, WTG-09 reports received via WhatsApp</span></li>
+        <li><span class="tl-date">10 Jun 26</span><div class="tl-dot" style="background:#f39c12"></div><span class="tl-content">Client cable faults identified on 5 spans</span></li>
+        <li><span class="tl-date">10 Jun 26</span><div class="tl-dot" style="background:#9b59b6"></div><span class="tl-content">272 RC→LC mid-couplers completed site-wide</span></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     TAB 2: FIBRE WIND FARM
+═══════════════════════════════════════════════ -->
+<div id="tab-wind" class="panel">
+
+  <div class="section-header">OYA Wind Farm — Fibre Ring Progress Tracker</div>
+
+  <div class="grid grid-4" style="margin-bottom:16px;">
+    <div class="kpi green">
+      <div class="kpi-label">CTTX Nodes Passing</div>
+      <div class="kpi-value">18<span style="font-size:14px;color:#4a9a6a">/18</span></div>
+      <div class="kpi-sub">All terminations compliant</div>
+    </div>
+    <div class="kpi amber">
+      <div class="kpi-label">Client Cable Faults</div>
+      <div class="kpi-value">5</div>
+      <div class="kpi-sub">Spans — client action req'd</div>
+    </div>
+    <div class="kpi blue">
+      <div class="kpi-label">Dome Joints (total)</div>
+      <div class="kpi-value">8</div>
+      <div class="kpi-sub">Enclosures across all spans</div>
+    </div>
+    <div class="kpi red">
+      <div class="kpi-label">Re-splice Required</div>
+      <div class="kpi-value">1</div>
+      <div class="kpi-sub">Ring-close repair joint</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:16px;">
+    <div class="card-title"><span class="icon">📡</span>WTG NODE STATUS — ALL 18 TURBINES</div>
+    <div class="scroll-x">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Node</th><th>Arm</th><th>CTTX Node</th><th>Node Loss</th><th>Span dB/km</th><th>Splice Budget</th><th>Scope</th><th>Notes</th>
+          </tr>
+        </thead>
+        <tbody id="wtg-table-body">
+          <!-- populated by JS -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <div class="card-title"><span class="icon">🔁</span>RING CLOSE SPAN — WTG-08 ↔ WTG-10 (2503m)</div>
+      <ul class="action-list">
+        <li class="danger"><span class="action-tag danger">RESPLICE</span>Cable break repair joint: 1.155 dB. CTTX obligation ≤0.50 dB. Schedule re-splice.</li>
+        <li class="warn"><span class="action-tag warn">TEST</span>3× dome joints (36 splices total, 1T×12F each). OTDR all 36 → SpecAfrica.</li>
+        <li class="info"><span class="action-tag info">NOTE</span>Dome losses are independent of the repair joint — dome splices each ≤0.10 dB.</li>
+        <li class="ok"><span class="action-tag ok">PASS</span>WTG-10 connector 1.218 dB — minor clean/replace (borderline, monitor).</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="icon">🗺</span>SPAN DISTANCES (IFC Rev 7)</div>
+      <table class="data-table">
+        <thead><tr><th>Span</th><th>Distance</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>OEM → WTG-01 (OPGW)</td><td>1367m + 157m FO</td><td><span class="status-chip chip-warn">CLIENT FAULT</span></td></tr>
+          <tr><td>WTG-01 → WTG-02</td><td>1824m</td><td><span class="status-chip chip-warn">CLIENT FAULT</span></td></tr>
+          <tr><td>WTG-02 → WTG-03</td><td>682m</td><td><span class="status-chip chip-warn">CLIENT FAULT</span></td></tr>
+          <tr><td>WTG-03 → WTG-04</td><td>1907m</td><td><span class="status-chip chip-pass">PASS</span></td></tr>
+          <tr><td>WTG-04 → WTG-05</td><td>2124m</td><td><span class="status-chip chip-pass">PASS</span></td></tr>
+          <tr><td>WTG-05 → WTG-06</td><td>548m</td><td><span class="status-chip chip-pass">PASS</span></td></tr>
+          <tr><td>WTG-06 → WTG-07</td><td>598m</td><td><span class="status-chip chip-warn">CLIENT FAULT</span></td></tr>
+          <tr><td>WTG-07 → WTG-08</td><td>1224m</td><td><span class="status-chip chip-pass">PASS (2× dome)</span></td></tr>
+          <tr><td>WTG-08 ↔ WTG-10 (ring close)</td><td>2503m</td><td><span class="status-chip chip-fail">RESPLICE REQ'D</span></td></tr>
+          <tr><td>WTG-17 → WTG-18</td><td>2557m</td><td><span class="status-chip chip-pass">PASS</span></td></tr>
+          <tr><td>Bottom arm other spans</td><td>TBC</td><td><span class="status-chip chip-none">PENDING OTDR</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     TAB 3: RING DIAGRAM
+═══════════════════════════════════════════════ -->
+<div id="tab-ring" class="panel">
+  <div class="section-header">OTDR Loss Map — ZA-OYA0-EN-EL-CC-9526 Rev 7 (Interactive)</div>
+  <div class="card" style="margin-bottom:12px;padding:12px 16px;">
+    <div style="font-size:11px;color:#7aaad4;line-height:1.8;">
+      <b style="color:#a0c8e8">Ref:</b> CTTX-OYA-OTDR-2026-01 &nbsp;|&nbsp;
+      <b style="color:#a0c8e8">Drawing:</b> ZA-OYA0-EN-EL-CC-9526 Rev 7 &nbsp;|&nbsp;
+      <b style="color:#a0c8e8">Cable:</b> G.652D Singlemode 24-core &nbsp;|&nbsp;
+      <b style="color:#a0c8e8">Node budget:</b> ≤1.20 dB (CTTX scope) &nbsp;|&nbsp;
+      <b style="color:#a0c8e8">Span budget:</b> ≤1.00 dB/km (client) &nbsp;|&nbsp;
+      <span style="color:#f39c12">⚠ Hover nodes/markers for detail</span>
+    </div>
+  </div>
+  <div class="diagram-wrap">
+    <iframe src="reports/OYA-Fibre-Ring-Diagram-Rev7.html" height="540" title="OYA Fibre Ring Diagram"></iframe>
+  </div>
+  <div style="margin-top:10px;text-align:right;">
+    <a class="btn btn-secondary" href="reports/OYA-Fibre-Ring-Diagram-Rev7.html" target="_blank">↗ Open Full Screen</a>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     TAB 4: FIELD REPORTS
+═══════════════════════════════════════════════ -->
+<div id="tab-reports" class="panel">
+  <div class="section-header">Field Reports — Site Activity Log</div>
+
+  <div class="grid grid-2" style="margin-bottom:16px;">
+    <div class="card">
+      <div class="card-title"><span class="icon">📋</span>PARSE WHATSAPP REPORT</div>
+      <p style="font-size:12px;color:#6a9ab0;margin-bottom:12px;line-height:1.7;">Paste a raw WhatsApp site report below. The system will extract turbine, splices, AC→LC changes, RMU status and update the tracker.</p>
+      <textarea id="report-input" style="width:100%;background:#071a30;border:1px solid #1a3a5c;border-radius:6px;color:#c0d8f0;padding:12px;font-size:12px;font-family:monospace;resize:vertical;min-height:180px;" placeholder="Paste WhatsApp report here...&#10;&#10;TURBINE NUMBER: WTG-09&#10;DATE: 2026-06-10&#10;SPLICES COMPLETED TODAY: 20&#10;..."></textarea>
+      <div style="margin-top:10px;display:flex;gap:8px;">
+        <button class="btn btn-primary" onclick="parseReport()">⚡ Parse Report</button>
+        <button class="btn btn-secondary" onclick="document.getElementById('report-input').value=''">Clear</button>
+      </div>
+      <div id="parse-output" style="margin-top:12px;font-size:11px;color:#80e0a0;background:#071a30;border-radius:6px;padding:10px;display:none;font-family:monospace;white-space:pre-wrap;line-height:1.6;"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">📁</span>RECENT FIELD REPORTS</div>
+      <ul class="timeline">
+        <li><span class="tl-date">16 Jun 26</span><div class="tl-dot" style="background:#2ecc71"></div><span class="tl-content"><b>WTG-08</b> — 24 splices | 12 AC→LC | No challenges</span></li>
+        <li><span class="tl-date">10 Jun 26</span><div class="tl-dot" style="background:#2ecc71"></div><span class="tl-content"><b>WTG-09</b> (Main) — 20 splices | 10 AC→LC | OVH fibre added</span></li>
+        <li><span class="tl-date">10 Jun 26</span><div class="tl-dot" style="background:#f39c12"></div><span class="tl-content"><b>WTG-09</b> (Basement) — 8 splices | Capacity expansion for WTG-11</span></li>
+        <li><span class="tl-date">10 Jun 26</span><div class="tl-dot" style="background:#2ecc71"></div><span class="tl-content"><b>WTG-07</b> — 24 splices | 12 AC→LC | No challenges</span></li>
+        <li><span class="tl-date">10 Jun 26</span><div class="tl-dot" style="background:#3498db"></div><span class="tl-content"><b>WTG-01</b> — 24 splices noted | OVH cable client fault pending</span></li>
+      </ul>
+      <div style="margin-top:14px;">
+        <a class="btn btn-secondary" href="reports/OYA-Progress-Report-2026-06-10.md" target="_blank">📄 View Progress Report</a>
+        &nbsp;
+        <a class="btn btn-secondary" href="reports/OYA-Client-Report-2026-06-10.md" target="_blank">📄 View Client Report</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">🗃</span>DAILY REPORTS ARCHIVE</div>
+    <table class="data-table">
+      <thead><tr><th>Date</th><th>Technician</th><th>WTG</th><th>Splices</th><th>AC→LC</th><th>Tested</th><th>Drawing</th><th>Challenges</th></tr></thead>
+      <tbody>
+        <tr><td>2026-06-16</td><td>Freddie</td><td>WTG-08</td><td>24</td><td>12</td><td>0</td><td>N</td><td style="color:#2ecc71">None</td></tr>
+        <tr><td>2026-06-10</td><td>Freddie</td><td>WTG-09 (Main)</td><td>20</td><td>10</td><td>0</td><td>N</td><td style="color:#f39c12">OVH fibre expansion</td></tr>
+        <tr><td>2026-06-10</td><td>Freddie</td><td>WTG-09 (Basement)</td><td>8</td><td>0</td><td>0</td><td>N</td><td style="color:#f39c12">WTG-11 capacity</td></tr>
+        <tr><td>2026-06-10</td><td>Freddie</td><td>WTG-07</td><td>24</td><td>12</td><td>0</td><td>N</td><td style="color:#2ecc71">None</td></tr>
+        <tr><td>2026-06-10</td><td>—</td><td>WTG-01</td><td>24</td><td>0</td><td>0</td><td>N</td><td style="color:#e74c3c">OVH cable fault</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     TAB 5: INFRASTRUCTURE
+═══════════════════════════════════════════════ -->
+<div id="tab-infra" class="panel">
+  <div class="section-header">Infrastructure Intelligence</div>
+  <div class="placeholder">
+    <div class="ph-icon">🧠</div>
+    <h3>CTTX Infrastructure Intelligence</h3>
+    <p>TypeScript-based infrastructure AI layer. This module connects to the <b>cttx-infrastructure-intelligence</b> repository. Add this repo to your Claude Code session scope to enable live integration.</p>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+      <a class="btn btn-primary" href="https://github.com/Gerhardhsmit/cttx-infrastructure-intelligence" target="_blank">↗ Open Repository</a>
+      <a class="btn btn-secondary" href="https://github.com/Gerhardhsmit/cttx-infrastructure-intelligence/issues" target="_blank">📋 View Issues</a>
+    </div>
+    <div style="margin-top:24px;text-align:left;max-width:500px;margin-left:auto;margin-right:auto;">
+      <div class="card-title" style="margin-bottom:10px;"><span class="icon">📦</span>WHAT THIS MODULE WILL SHOW</div>
+      <ul class="action-list">
+        <li class="info"><span class="action-tag info">PLANNED</span>Network topology live view — all CTTX-managed circuits</li>
+        <li class="info"><span class="action-tag info">PLANNED</span>OTDR test result ingestion &amp; trend analysis</li>
+        <li class="info"><span class="action-tag info">PLANNED</span>AI-assisted fault prediction from OTDR loss history</li>
+        <li class="info"><span class="action-tag info">PLANNED</span>Asset register — cable inventory, splice trays, connectors</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     TAB 6: WEBSITE
+═══════════════════════════════════════════════ -->
+<div id="tab-website" class="panel">
+  <div class="section-header">CTTX Services Website</div>
+  <div class="placeholder">
+    <div class="ph-icon">🌐</div>
+    <h3>CTTX Services Website</h3>
+    <p>TypeScript-based company website (private repo). Add this repo to your Claude Code session scope to manage content, deployments and open issues from here.</p>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+      <a class="btn btn-primary" href="https://github.com/Gerhardhsmit/cttx-services-website" target="_blank">↗ Open Repository</a>
+      <a class="btn btn-secondary" href="https://github.com/Gerhardhsmit/cttx-services-website/issues" target="_blank">📋 4 Open Issues</a>
+    </div>
+    <div style="margin-top:24px;text-align:left;max-width:500px;margin-left:auto;margin-right:auto;">
+      <div class="card-title" style="margin-bottom:10px;"><span class="icon">⚡</span>OPEN ISSUES (4)</div>
+      <ul class="action-list">
+        <li class="warn"><span class="action-tag warn">OPEN</span>Issue tracker — 4 open issues on cttx-services-website</li>
+        <li class="info"><span class="action-tag info">INFO</span>Add repo to session scope for inline issue management</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Clock ──
+function tick(){
+  const now=new Date();
+  document.getElementById('clock').textContent=
+    now.toLocaleTimeString('en-ZA',{hour12:false});
+}
+tick(); setInterval(tick,1000);
+
+// ── Tab switcher ──
+function switchTab(name,el){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  el.classList.add('active');
+}
+
+// ── WTG Table ──
+const WTG_DATA=[
+  {id:'WTG-01',arm:1,code:'CLIENT_CABLE',nodeLoss:'1.649',spanDbKm:'2.567',scope:'CTTX+CLIENT',notes:'OVH_14 fault — 12.9 dB span | CTTX re-splice pending after client repair'},
+  {id:'WTG-02',arm:1,code:'CLIENT_CABLE',nodeLoss:'0.179',spanDbKm:'3.861',scope:'CTTX+CLIENT',notes:'Span cable physical fault — client investigation req\'d'},
+  {id:'WTG-03',arm:1,code:'CLIENT_CABLE',nodeLoss:'0.318',spanDbKm:'1.103',scope:'CTTX+CLIENT',notes:'12/24 cores at 1.103 dB/km | RMU-03 | Met Mast 1'},
+  {id:'WTG-04',arm:1,code:'PASS',nodeLoss:'—',spanDbKm:'0.390',scope:'CTTX',notes:'All clear'},
+  {id:'WTG-05',arm:1,code:'PASS',nodeLoss:'—',spanDbKm:'0.599',scope:'CTTX',notes:'RMU-05 branch'},
+  {id:'WTG-06',arm:1,code:'PASS',nodeLoss:'—',spanDbKm:'0.870',scope:'CTTX',notes:'All clear'},
+  {id:'WTG-07',arm:1,code:'CLIENT_CABLE',nodeLoss:'0.600',spanDbKm:'1.112',scope:'CTTX+CLIENT',notes:'23/24 cores fault | RMU-07 | 2× dome joints outgoing span'},
+  {id:'WTG-08',arm:1,code:'PASS',nodeLoss:'—',spanDbKm:'0.746',scope:'CTTX',notes:'Ring-close span: dome re-splice + repair joint action'},
+  {id:'WTG-09',arm:2,code:'CLIENT_CABLE',nodeLoss:'0.703',spanDbKm:'14.355',scope:'CTTX+CLIENT',notes:'OPGW OVH fault 14.355 dB/km | Met Mast 2 | OEM entry Arm 2'},
+  {id:'WTG-10',arm:2,code:'CLIENT_CABLE',nodeLoss:'1.218',spanDbKm:'6.762',scope:'CTTX+CLIENT',notes:'RMU cable fault 6.762 dB/km | Ring-close end | minor connector clean'},
+  {id:'WTG-11',arm:2,code:'PASS',nodeLoss:'0.330',spanDbKm:'0.701',scope:'CTTX',notes:'RMU-11 branch'},
+  {id:'WTG-12',arm:2,code:'PASS',nodeLoss:'0.586',spanDbKm:'0.624',scope:'CTTX',notes:'RMU-12 | 1× dome joint outgoing to WTG-10'},
+  {id:'WTG-13',arm:2,code:'PASS',nodeLoss:'0.118',spanDbKm:'0.414',scope:'CTTX',notes:'Excellent — 0.118 dB node'},
+  {id:'WTG-14',arm:2,code:'CLIENT_CABLE',nodeLoss:'1.043',spanDbKm:'1.134',scope:'CTTX+CLIENT',notes:'11/24 cores fault | RMU-14'},
+  {id:'WTG-15',arm:2,code:'PASS',nodeLoss:'0.577',spanDbKm:'0.626',scope:'CTTX',notes:'RMU-15 branch'},
+  {id:'WTG-16',arm:2,code:'PASS',nodeLoss:'0.664',spanDbKm:'0.583',scope:'CTTX',notes:'RMU-16 branch'},
+  {id:'WTG-17',arm:2,code:'CLIENT_CABLE',nodeLoss:'0.584',spanDbKm:'1.783',scope:'CTTX+CLIENT',notes:'15/24 cores at 1.783 dB/km | RMU-17'},
+  {id:'WTG-18',arm:2,code:'PASS',nodeLoss:'0.171',spanDbKm:'0.751',scope:'CTTX',notes:'0.171 dB node — excellent'},
+];
+
+const chipMap={
+  PASS:'<span class="status-chip chip-pass">CTTX PASS ✓</span>',
+  CLIENT_CABLE:'<span class="status-chip chip-client">CLIENT OBS</span>',
+  CTTX_ACTION:'<span class="status-chip chip-fail">RESPLICE</span>',
+};
+
+const tbody=document.getElementById('wtg-table-body');
+WTG_DATA.forEach(w=>{
+  const spanOk=parseFloat(w.spanDbKm)<=1.00;
+  const spanChip=isNaN(parseFloat(w.spanDbKm))?'<span class="status-chip chip-none">—</span>':
+    spanOk?`<span class="status-chip chip-pass">${w.spanDbKm}</span>`:
+    `<span class="status-chip chip-fail">${w.spanDbKm}</span>`;
+  tbody.innerHTML+=`<tr>
+    <td><b>${w.id}</b></td>
+    <td style="color:#5a8ab0">ARM ${w.arm}</td>
+    <td>${chipMap[w.code]||w.code}</td>
+    <td style="color:${parseFloat(w.nodeLoss)>1.20?'#e74c3c':parseFloat(w.nodeLoss)>0.80?'#f39c12':'#c0d8f0'}">${w.nodeLoss}</td>
+    <td>${spanChip}</td>
+    <td><span class="status-chip chip-none">≤1.20 dB</span></td>
+    <td><span class="scope-badge ${w.scope==='CTTX'?'scope-cttx':'scope-client'}">${w.scope}</span></td>
+    <td style="color:#6a9ab0;font-size:11px;">${w.notes}</td>
+  </tr>`;
+});
+
+// ── Simple report parser ──
+function parseReport(){
+  const raw=document.getElementById('report-input').value.trim();
+  if(!raw){return;}
+  const out=document.getElementById('parse-output');
+  out.style.display='block';
+  const lines=raw.split('\n');
+  const get=(key)=>{
+    const l=lines.find(x=>x.toUpperCase().includes(key.toUpperCase()));
+    return l?l.split(':').slice(1).join(':').trim():'—';
+  };
+  const turbine=get('TURBINE');
+  const date=get('DATE');
+  const splices=get('SPLICES COMPLETED');
+  const rmu=get('RMU');
+  const aclc=get('AC');
+  const challenges=get('CHALLENGES');
+  out.textContent=`✅ PARSED REPORT
+───────────────────────────
+Turbine:     ${turbine}
+Date:        ${date}
+Splices:     ${splices}
+RMU:         ${rmu}
+AC→LC:       ${aclc}
+Challenges:  ${challenges}
+───────────────────────────
+→ Run /parse-site-report in Claude Code to update progress.json`;
+}
+</script>
+</body>
+</html>
