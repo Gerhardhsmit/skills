@@ -5,7 +5,9 @@ description: CTTX Link & Assessment Architect. Turns a customer request (Outlook
 
 # CTTX Link & Assessment Architect
 
-Full specification: `reference/spec-v1.0.md`. It is binding. This file is the operating procedure.
+Specifications (binding): `reference/spec-v1.0.md` (discovery, site confidence, test and acceptance) and `reference/spec-v1.0-solution-architect.md` (evidence labels, the §14 output, graph edge classes, mast-location, technology, layers, redundancy and assessment pricing). The solution-architect edition governs wherever the two overlap. This file is the operating procedure.
+
+**Evidence labels, used on every statement:** VERIFIED · SOURCE-DERIVED · CALCULATED · INFERRED · ASSUMED · UNKNOWN · FIELD VERIFY. **Graph edges:** VERIFIED / PROBABLE / CANDIDATE / UNKNOWN (and REJECTED, with its evidence).
 **IMPLEMENT → EXECUTE → VERIFY → REPORT.** Do the work. Don't describe what you would do.
 
 Engine: `lib/architect.py` (discovery → terrain → hop graph → link budgets → report + evidence register).
@@ -28,6 +30,10 @@ python3 .claude/skills/link-assessment-architect/tests/test_scenarios.py   # Tes
    - `requirement.because`: the reason behind the number ("100 Mbps *because* cloud accounting, VoIP and CCTV drop on LTE…"). Also fill `architecture` (internet vs site-to-site vs private network vs multi-building), `availability` and `latency`.
    - `area`: `urban | suburban | rural | remote`. This drives the adaptive search radius (2→10 km up to 5→60 km).
    - `extra_sites`: other lodges, buildings or WTG O&M points that need distribution links.
+   - `property.features`: the customer's buildings, gates, pumps, boreholes, workshops and high points (`{name, kind, lat, lon}`). Leave `lat` null when it's unknown; the report then lists it as an information gap.
+   - `known_facts`: facts from correspondence (`{claim, source, date, confidence, kind: property|fibre|carrier|coverage|infrastructure|requirement, status}`). A carrier's written statement is **SOURCE-DERIVED**. Only CTTX's own confirmation is **VERIFIED**.
+   - `known_infrastructure`: towers, fibre POPs, exchanges, data centres or CTTX sites you have coordinates for (`{name, kind: carrier_mast|fibre_pop|exchange|datacentre|cttx, lat, lon, height_m, source, status}`). These become routing targets.
+   - `summary`, `field_checks`, `risks`, `commercial`: write these in plain language once the engine has run.
    Don't ask the customer anything that the email, maps or tools can answer.
 
 ## Step 2 — Property
@@ -43,6 +49,15 @@ Run `python3 $A run <slug>`. The engine does all of this and records every sourc
 - **Hop graph.** Nodes are the property, carrier candidates, relays and extra sites. Dijkstra costs each hop at 10 km-equivalent plus distance, with penalties for taller masts, new relay sites and unverified terrain, and a target penalty by confidence (a Vodacom site gets a bonus). The result is the primary route with the fewest practical hops, an alternative that avoids the primary's carrier, and multi-site distribution routes.
 - **Link budget** per hop, using the first planning class in `lib/equipment-library.json` that reaches ≥ 20 dB fade margin. These classes are **desk defaults, not datasheets**, so they're reported as INFERRED. When authoritative Cambium LINKPlanner profiles are available, put them into the library with `verified: true`.
 
+The engine also produces:
+- **The infrastructure graph**, with every analysed edge classified.
+- **The mast-location engine**: every candidate relay gets coordinates, elevation and height relative to the property, distances, CALCULATED visibility to the property and its two nearest carrier sites, access (mapped roads), power (mapped lines and substations), ownership (UNKNOWN), the reason it was chosen and the label *Candidate mast position — requires field verification*.
+- **Link engineering** per hop: FSPL, EIRP, received level and fade margin (CALCULATED from ASSUMED planning classes). Rain is negligible below 10 GHz; above that, the ITU calculation is required and the value is UNKNOWN. Interference stays UNKNOWN until a spectrum scan. Modulation and throughput are **not estimated** without manufacturer profiles.
+- **Technology options**, driven by the requirement: fibre, carrier services, 60 GHz, E-band, 5 GHz PtP, licensed microwave (for SCADA, production or safety only), PMP, Wi-Fi and LEO.
+- **The six network layers** (physical → management) and **redundancy tied to named failure modes**. It only recommends redundancy when there is a critical driver or an availability target.
+- **The assessment band** within R7,500–R25,000, built from sites, hops, relays, terrain, remoteness and missing routes. Simple carrier-fibre cases are marked "paid assessment not justified".
+- **The §17 architect checklist.**
+
 ## Step 4 — Verify (before anything leaves)
 Read `projects/<slug>/assessment.md` and check it against the spec:
 - Every factual claim has an evidence row. Nothing CELL LOCATION ONLY is called a mast. No "Vodacom will provide backhaul".
@@ -57,12 +72,13 @@ Read `projects/<slug>/assessment.md` and check it against the spec:
 - Create a draft to the client (Outlook `outlook_create_draft` or Gmail `create_draft`). **Send only when Gerhard says "send".**
 
 ## Step 6 — Learn (§30)
-Every `run` logs desk results (unverified) to the intelligence graph. After the site visit, write `projects/<slug>/field-verification.json`:
+Every `run` logs desk results (unverified, deduplicated) to `data/intelligence-graph.json`: carrier sites, relay candidates, rejected relay-to-carrier links, source reliability, and an assessment record (industry, drivers, requirement, architecture, hop distances, equipment classes, assessment band). Links to customer locations stay in the project folder. The knowledge base is **git-ignored while the repo is public**. After the site visit, write `projects/<slug>/field-verification.json`:
 ```json
 {"date": "YYYY-MM-DD",
  "nodes": [{"name": "Vodacom Kareedouw", "lat": -33.9, "lon": 24.3, "kind": "carrier", "operator": "Vodacom", "height_m": 45}],
  "rejected_links": [{"a": "PROPERTY", "b": "C2", "reason": "blue-gum plantation 25 m at 3 km"}],
- "verified_routes": [{"nodes": ["..."], "equipment": "PTP 670 + 2ft", "rx_dbm": -52}]}
+ "verified_routes": [{"nodes": ["..."], "equipment": "PTP 670 + 2ft", "rx_dbm": -52}],
+ "commercial_outcome": "assessment sold R12 500", "findings": "blue-gums 25 m on bearing 312°"}
 ```
 Then run `learn <slug>`. Verified nodes come back as CONFIRMED in every future assessment nearby.
 

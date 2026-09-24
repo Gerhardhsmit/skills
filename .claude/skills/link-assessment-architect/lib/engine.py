@@ -30,8 +30,8 @@ class Evidence:
     def __init__(self):
         self.rows = []
 
-    def add(self, claim, source, confidence, date=TODAY):
-        self.rows.append({"claim": claim, "source": source, "date": date, "confidence": confidence})
+    def add(self, claim, source, confidence, date=TODAY, status="SOURCE-DERIVED"):
+        self.rows.append({"claim": claim, "status": status, "source": source, "date": date, "confidence": confidence})
 
 
 def load_equipment():

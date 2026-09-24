@@ -35,6 +35,6 @@ Technicians send this template daily before 17:00:
 ```
 
 ### `/link-assessment-architect`
-CTTX Link & Assessment Architect (spec v1.0). Customer email or pin → business drivers → infrastructure discovery (OSM, OpenCelliD, Google Earth KML) → terrain/Fresnel → minimum-hop relay route + alternative → link budgets → evidence-backed preliminary assessment → client draft.
+CTTX Link & Assessment Architect (spec v1.0 + Solution Architect edition). Customer email or pin → business drivers → infrastructure discovery (OSM, OpenCelliD, Google Earth KML) → terrain/Fresnel → minimum-hop relay route + alternative → link budgets → evidence-backed preliminary assessment → client draft.
 Skill: `.claude/skills/link-assessment-architect/` · client jobs: `projects/<slug>/` · learned infrastructure: `data/intelligence-graph.json`
 Test Mode: `python3 .claude/skills/link-assessment-architect/tests/test_scenarios.py`

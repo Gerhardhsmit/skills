@@ -218,6 +218,34 @@ def s10_no_dem():
     return "10 DEM outage → LOS unverified", dict(i, slug="no-dem"), w, check
 
 
+SECTIONS = ["Executive Summary", "Business Requirement", "Existing Environment", "Infrastructure Discovery",
+            "Geographic Analysis", "Candidate Architecture", "Terrain / LOS Analysis", "Technology Options", "Risks",
+            "Information Gaps", "Field Survey Requirements", "Recommended Next Engineering Step", "Evidence register"]
+
+
+def generic_checks(r, md):
+    """Solution-architect spec checks applied to every scenario."""
+    import assess
+    missing = [h for h in SECTIONS if h not in md] if "property" in r else []
+    assert not missing, f"report sections missing: {missing}"
+    bad = [e for e in r["evidence"] if e.get("status") not in assess.STATUSES]
+    assert not bad, f"evidence rows without a valid status: {bad[:2]}"
+    assert any(e["status"] == "ASSUMED" for e in r["evidence"]) or "property" not in r, "assumptions must be declared"
+    for e in r.get("graph_edges", []):
+        assert e["edge_class"] in assess.EDGE_CLASSES
+        if e["status"] in ("BLOCKED", "MARGINAL"):
+            assert e["edge_class"] == "REJECTED"
+        if e["status"] == "UNVERIFIED":
+            assert e["edge_class"] == "UNKNOWN", "no-DEM edges must stay UNKNOWN"
+    for m in r.get("mast_candidates", []):
+        for k in ("lat", "lon", "dist_property_km", "visibility", "access", "power", "ownership", "reason", "confidence"):
+            assert k in m, f"mast candidate missing {k}"
+        assert m["label"] == assess.MAST_LABEL
+    if "property" in r:
+        b = assess.assessment_band(r)
+        assert assess.PRICE_MIN <= b["low"] <= b["high"] <= assess.PRICE_MAX
+
+
 SCENARIOS = [s1_urban, s2_farm_behind_mountain, s3_reserve_lodges, s4_wind, s5_solar_cells_down, s6_mine,
              s7_remote_hospitality, s8_email, s9_all_down, s10_no_dem]
 
@@ -233,7 +261,7 @@ def main():
         try:
             check(r)
             md = report(r)
-            assert "Evidence register" in md and "Business drivers" in md
+            generic_checks(r, md)
             with open(os.path.join(OUT, f"{i['slug']}.md"), "w") as f:
                 f.write(md)
             passed += 1
