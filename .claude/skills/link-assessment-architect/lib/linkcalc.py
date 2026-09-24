@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Point-to-point wireless link calculator for the /link-planner skill.
+"""Point-to-point wireless link calculator (standalone) for the /link-assessment-architect skill.
 
 Usage:
-    python3 .claude/skills/link-planner/linkcalc.py <project.json> [--json]
+    python3 .claude/skills/link-assessment-architect/lib/linkcalc.py <project.json> [--json]
 
-Reads a project file (see .claude/skills/link-planner/example-project.json), computes the
+Reads a project file (see .claude/skills/link-assessment-architect/reference/linkcalc-example.json), computes the
 path geometry, Fresnel/earth-bulge clearance and link budget for every link,
 and prints a markdown report (or JSON with --json).
 """

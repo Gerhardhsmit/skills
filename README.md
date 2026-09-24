@@ -34,6 +34,7 @@ Technicians send this template daily before 17:00:
 *PHOTOS ATTACHED (Y/N): Y/N
 ```
 
-### `/link-planner`
-Wireless link pipeline: site assessment → link design (Fresnel, link budget) → proposal → Gmail draft to the client → execution tracking.
-Skill: `.claude/skills/link-planner/` · client jobs: `projects/<client-slug>/`
+### `/link-assessment-architect`
+CTTX Link & Assessment Architect (spec v1.0). Customer email or pin → business drivers → infrastructure discovery (OSM, OpenCelliD, Google Earth KML) → terrain/Fresnel → minimum-hop relay route + alternative → link budgets → evidence-backed preliminary assessment → client draft.
+Skill: `.claude/skills/link-assessment-architect/` · client jobs: `projects/<slug>/` · learned infrastructure: `data/intelligence-graph.json`
+Test Mode: `python3 .claude/skills/link-assessment-architect/tests/test_scenarios.py`

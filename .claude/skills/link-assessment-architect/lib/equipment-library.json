@@ -1,0 +1,40 @@
+{
+  "_note": "PLANNING CLASSES ONLY. These are CTTX desk-study defaults, NOT authoritative datasheet values. Replace/extend with Cambium LINKPlanner radio profiles (export) and set verified=true. Reports label link-budget results from unverified classes as INFERRED.",
+  "eirp_limit_dbm": null,
+  "eirp_note": "Confirm the applicable ICASA limit for the band/channel before final design.",
+  "min_fade_margin_db": 20,
+  "classes": [
+    {
+      "id": "PTP-60G-SHORT",
+      "label": "60 GHz licence-exempt PtP (short, very high capacity)",
+      "family": "Cambium cnWave / PTP 60 GHz class",
+      "freq_mhz": 60000, "tx_dbm": 10, "gain_dbi": 38, "sensitivity_dbm": -65,
+      "gaseous_loss_db_per_km": 15, "max_km": 1.5,
+      "capacity_mbps": null, "verified": false
+    },
+    {
+      "id": "PTP-5G-INTEGRATED",
+      "label": "5 GHz carrier-grade PtP, integrated ~25 dBi antenna",
+      "family": "Cambium PTP 550 / PTP 670 integrated class",
+      "freq_mhz": 5800, "tx_dbm": 20, "gain_dbi": 25, "sensitivity_dbm": -75,
+      "gaseous_loss_db_per_km": 0, "max_km": 12,
+      "capacity_mbps": null, "verified": false
+    },
+    {
+      "id": "PTP-5G-DISH-2FT",
+      "label": "5 GHz carrier-grade PtP, 2 ft parabolic dish",
+      "family": "Cambium PTP 670 / PTP 820-class connectorised + 2 ft dish",
+      "freq_mhz": 5800, "tx_dbm": 20, "gain_dbi": 29, "sensitivity_dbm": -75,
+      "gaseous_loss_db_per_km": 0, "max_km": 30,
+      "capacity_mbps": null, "verified": false
+    },
+    {
+      "id": "PTP-5G-DISH-4FT",
+      "label": "5 GHz carrier-grade PtP, 4 ft parabolic dish (long haul)",
+      "family": "Cambium PTP 670 connectorised + 4 ft dish",
+      "freq_mhz": 5800, "tx_dbm": 18, "gain_dbi": 34.5, "sensitivity_dbm": -75,
+      "gaseous_loss_db_per_km": 0, "max_km": 60,
+      "capacity_mbps": null, "verified": false
+    }
+  ]
+}
