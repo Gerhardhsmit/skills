@@ -40,7 +40,11 @@ def cmd_init(a):
         with open(os.path.join(pdir, "email.txt"), "w") as f:
             f.write(email)
     industry, chain = drivers.suggest(email)
-    mbps = [int(x) for x in re.findall(r"(\d{2,5})\s*mbps", email.lower())]
+    low = email.lower()
+    mbps = [int(x) for x in re.findall(r"(\d{2,5})\s*mbps", low)]
+    up = re.search(r"(\d{2,5})\s*(?:mbps\s*)?(?:up\b|upload|upstream)", low)
+    down = re.search(r"(\d{2,5})\s*(?:mbps\s*)?(?:down\b|download|downstream)", low)
+    pair = re.search(r"(\d{2,5})\s*/\s*(\d{2,5})\s*mbps", low)
     loc = a.location or ""
     if not loc:
         m = parse_location(email)
@@ -54,7 +58,8 @@ def cmd_init(a):
                                         "requested_service", "symmetry", "reliability", "growth",
                                         "existing_infrastructure", "deadline", "budget", "pain_points")},
             "drivers": chain,
-            "requirement": {"down_mbps": max(mbps) if mbps else None, "up_mbps": max(mbps) if mbps else None,
+            "requirement": {"down_mbps": int(down.group(1)) if down else int(pair.group(1)) if pair else (max(mbps) if mbps else None),
+                            "up_mbps": int(up.group(1)) if up else int(pair.group(2)) if pair else (max(mbps) if mbps else None),
                             "because": "", "availability": "", "latency": "", "services": [],
                             "architecture": ""},
         },
@@ -88,7 +93,8 @@ def resolve_property(inp, src, ev):
         return p["lat"], p["lon"]
     parsed = parse_location(p.get("query"))
     if parsed:
-        ev.add(f"Property coordinate {parsed[0]}, {parsed[1]}", f"Customer-supplied location '{p['query']}'", "High")
+        if not any(k.get("kind") == "property" and str(parsed[0]) in k["claim"] for k in inp.get("known_facts", [])):
+            ev.add(f"Property coordinate {parsed[0]}, {parsed[1]}", f"Customer-supplied location '{p['query']}'", "High")
         p.update(lat=parsed[0], lon=parsed[1], source="customer")
         return parsed
     if p.get("query"):
@@ -110,6 +116,8 @@ def run(inp, src, intel, eq):
     params = inp.get("params", {})
     out = {"slug": inp["slug"], "date": TODAY, "sources_mode": src.name, "customer": cust}
 
+    for k in inp.get("known_facts", []):
+        ev.add(k["claim"], k["source"], k.get("confidence", "Medium"), k.get("date", TODAY))
     loc = resolve_property(inp, src, ev)
     if not loc:
         out["status"] = "BLOCKED: property location unresolved"
@@ -118,6 +126,10 @@ def run(inp, src, intel, eq):
     lat, lon = loc
     prop = {"lat": lat, "lon": lon}
     out["property"] = inp["property"]
+    out["known_facts"] = inp.get("known_facts", [])
+    out["summary"] = inp.get("summary", [])
+    out["field_checks"] = inp.get("field_checks", [])
+    out["commercial"] = inp.get("commercial", [])
 
     pg = src.elevations([(lat, lon)])
     prop_ground = pg[0] if pg else None
@@ -180,7 +192,17 @@ def run(inp, src, intel, eq):
         ev.add(f"REJECTED {e['a']} → {e['b']} ({e['distance_km']} km): {e.get('reason', e['status'])}",
                "Terrain profile from " + terrain_source(log), "Preliminary")
     out["evidence"], out["source_log"] = ev.rows, log.entries
-    out["status"] = "ROUTE FOUND" if route["primary"] else "NO DESK ROUTE — field survey / wider search required"
+    blocked = any(not e["ok"] for e in log.entries) and not sites
+    fibre = any(k.get("kind") == "fibre" for k in inp.get("known_facts", []))
+    if route["primary"]:
+        out["status"] = "ROUTE FOUND"
+    elif fibre:
+        out["status"] = "FIBRE AVAILABLE (carrier-confirmed) — wireless route " + (
+            "NOT ASSESSED: discovery sources unavailable" if blocked else "not found")
+    elif blocked:
+        out["status"] = "INCOMPLETE — discovery sources unavailable; no route claimed"
+    else:
+        out["status"] = "NO DESK ROUTE — field survey / wider search required"
     return out
 
 
@@ -293,6 +315,7 @@ def report(o):
 
     # 1 executive summary
     L += ["## 1. Executive summary"]
+    L += [f"- {x}" for x in o.get("summary", [])]
     need = f"{req.get('down_mbps') or '?'} / {req.get('up_mbps') or '?'} Mbps" if req.get("down_mbps") else "capacity TBC"
     because = req.get("because") or "; ".join(d["driver"] for d in c.get("drivers", [])[:3])
     L.append(f"- **Need:** {need} because {because}.")
@@ -301,6 +324,8 @@ def report(o):
     if pr:
         L.append(f"- **Desk finding:** a {len(pr['hops'])}-hop path appears engineerable to "
                  f"{nodes_by(nodes)[pr['nodes'][-1]]['name']} ({nodes_by(nodes)[pr['nodes'][-1]]['confidence']}).")
+    elif any(k.get("kind") == "fibre" for k in o.get("known_facts", [])):
+        L.append("- **Desk finding:** carrier-confirmed fibre at the property is the primary path; no wireless route is claimed.")
     else:
         L.append("- **Desk finding:** no desk-verifiable route within the search limits — a site survey is required.")
     if failed:
@@ -345,6 +370,13 @@ def report(o):
                  f"{s['distance_km']} km {compass(s['bearing_deg'])} | {', '.join(s['operators']) or '—'} | "
                  f"{str(s['height_m']) + ' m' if s.get('height_m') else 'UNKNOWN'} | {verdict} | "
                  f"{'; '.join(s['backhaul_evidence']) or '—'} |")
+    facts = [k for k in o.get("known_facts", []) if k.get("kind") in ("fibre", "carrier", "coverage", "infrastructure")]
+    if facts:
+        L += ["", "**Carrier / operator confirmations (from correspondence):**"]
+        L += [f"- {k['claim']} — _{k['source']}, {k.get('date', '')}_ ({k.get('confidence', 'Medium')})" for k in facts]
+    if not o["infrastructure"]:
+        L += ["", "_No mast/tower candidates were discovered by automated sources"
+              + (" (sources unavailable — see source log); this does NOT mean none exist._" if any(not e["ok"] for e in o["source_log"]) else "._")]
     if o["corridors"]:
         L += ["", "**Corridors (nearest):** " + "; ".join(f"{c_['kind']} {c_.get('name') or ''} {c_['distance_km']} km {c_['bearing']}"
                                                           for c_ in o["corridors"][:6])]
@@ -372,6 +404,8 @@ def report(o):
 
     # 8 terrain
     L += ["", "## 8. Terrain"]
+    if not any("levation" in e["source"] and e["ok"] for e in o["source_log"]):
+        L.append("- **Not analysed** — no elevation source was reachable. No line-of-sight is claimed for any path.")
     for rt in filter(None, [pr, alt]):
         for h in rt["hops"]:
             if "highest_obstruction" in h:
@@ -396,6 +430,12 @@ def report(o):
     L += ["", "## 10. Confidence"]
     conf = {"CONFIRMED": [], "PROBABLE": [], "INFERRED": [], "UNKNOWN": []}
     conf["CONFIRMED"].append(f"Property location ({p.get('source')})") if p.get("source") == "customer" else conf["PROBABLE"].append("Property location (geocoded)")
+    for k in o.get("known_facts", []):
+        if k.get("kind") == "property":
+            continue
+        lvl = str(k.get("confidence", "")).lower()
+        bucket = "CONFIRMED" if lvl.startswith("high") else "PROBABLE" if lvl.startswith("medium") else "INFERRED"
+        conf[bucket].append(f"{k['claim']} ({k['source'].split(',')[0]})")
     for s in o["infrastructure"]:
         k = {"CONFIRMED": "CONFIRMED", "PROBABLE": "PROBABLE"}.get(s["confidence"], "UNKNOWN")
         conf[k].append(f"{s['name']} physical site")
@@ -409,8 +449,10 @@ def report(o):
 
     # 11 field verification
     L += ["", "## 11. Field verification"]
-    fv = ["Confirm property pin, mounting position and achievable mast height at the customer site",
-          "Line-of-sight check from each hop endpoint (binoculars/drone/photo at bearing) incl. trees & buildings"]
+    fv = ["Confirm property pin and the exact building/room to be served"]
+    if pr or alt:
+        fv += ["Mounting position and achievable mast height at the customer site",
+               "Line-of-sight check from each hop endpoint (binoculars/drone/photo at bearing) incl. trees & buildings"]
     for rt in filter(None, [pr, alt]):
         for nid in rt["nodes"]:
             n = nodes_by(nodes)[nid]
@@ -420,23 +462,31 @@ def report(o):
             elif n["role"] in ("relay", "structure"):
                 fv.append(f"{nid} {n['name']}: landowner permission, access road, power (solar), mast foundation, "
                           f"{'~' + str(n['h_design']) + ' m mast'}")
-    fv.append("Spectrum scan at each endpoint (5 GHz noise floor)")
+    if pr or alt:
+        fv.append("Spectrum scan at each endpoint (5 GHz noise floor)")
+    fv += o.get("field_checks", [])
     L += [f"- [ ] {x}" for x in dict.fromkeys(fv)]
 
     # 12 commercial
-    L += ["", "## 12. Commercial opportunity",
-          "- **Sell first:** CTTX Private Infrastructure Network Assessment (site survey + LOS verification + final design).",
+    L += ["", "## 12. Commercial opportunity"]
+    if o.get("commercial"):
+        L += [f"- {x}" for x in o["commercial"]]
+    else:
+        L += ["- **Sell first:** CTTX Private Infrastructure Network Assessment (site survey + LOS verification + final design).",
           f"- **Infrastructure:** {len(pr['hops']) if pr else '?'}-hop private backhaul"
           + (f" to {nodes_by(nodes)[pr['nodes'][-1]]['name']}" if pr else "") + ".",
           "- **Redundant route:** " + ("alternative path identified — offer as resilience phase." if alt else "to be designed after survey."),
           "- **Private network:** " + ("multi-site distribution across customer sites." if o.get("distribution") else
-                                       "on-site LAN/Wi-Fi, CCTV and VoIP segments driven by §2."),
-          "", "### What we know / believe / need to verify / what the network could look like / what the assessment will confirm",
-          f"- **Know:** property location; {sum(s['confidence'] == 'CONFIRMED' for s in o['infrastructure'])} confirmed sites.",
+                                       "on-site LAN/Wi-Fi, CCTV and VoIP segments driven by §2.")]
+    facts = o.get("known_facts", [])
+    L += ["", "### What we know / believe / need to verify / what the network could look like / what the assessment will confirm",
+          f"- **Know:** property location; {sum(s['confidence'] == 'CONFIRMED' for s in o['infrastructure'])} confirmed sites"
+          + "".join(f"; {k['claim']}" for k in facts if str(k.get('confidence', '')).lower().startswith('high') and k.get('kind') != 'property') + ".",
           f"- **Believe:** {sum(s['confidence'] == 'PROBABLE' for s in o['infrastructure'])} probable carrier sites; "
           + ("desk route clears terrain." if pr else "no desk route yet."),
           "- **Verify:** see §11.",
-          "- **Could look like:** " + (" → ".join(nodes_by(nodes)[x]["name"] for x in pr["nodes"]) + " → network core" if pr else "TBD after survey"),
+          "- **Could look like:** " + (" → ".join(nodes_by(nodes)[x]["name"] for x in pr["nodes"]) + " → network core" if pr
+                                       else c.get("requirement", {}).get("architecture") or "TBD after survey"),
           "- **Assessment confirms:** LOS, heights, permissions, backhaul terms, final radio selection & price."]
     L += [""] + evidence_md(o)
     return "\n".join(L)

@@ -24,6 +24,8 @@ CHAINS = {
                "Redundant route + backup power"),
     "production": ("Production / control systems", "Operations run without interruption",
                    "Deterministic latency, high availability", "Carrier-grade protected network"),
+    "mobility": ("Relocatable / project-site connectivity", "Connectivity moves with the project",
+                 "Rapid deploy + relocate, no long fixed contracts", "Portable LEO/wireless kit + relocatable backhaul"),
     "staff": ("Staff accommodation connectivity", "Staff retention and welfare", "Shared capacity, managed",
               "Segmented access network on the backhaul"),
 }
@@ -36,6 +38,7 @@ INDUSTRY = {
     "solar": ["scada", "cctv", "security", "cloud"],
     "mining": ["production", "safety", "iot", "cctv", "voip", "cloud"],
     "business": ["cloud", "voip", "cctv", "pos"],
+    "engineering": ["cloud", "voip", "intersite", "mobility", "cctv"],
 }
 
 KEYWORDS = {
@@ -44,17 +47,20 @@ KEYWORDS = {
     "farm": ["farm", "irrigation", "pivot", "borehole", "orchard", "citrus", "dairy", "livestock", "boerdery"],
     "wind": ["wind farm", "wtg", "turbine", "wind energy"],
     "solar": ["solar", "pv plant", "pv farm"],
-    "mining": ["mine", "mining", "quarry", "pit", "shaft", "plant"],
+    "mining": ["mine ", "mining operation", "quarry", "open pit", "shaft", "our mine"],
+    "engineering": ["engineering group", "engineering company", "construction", "contractor", "project sites",
+                    "site-based projects"],
 }
 
 SERVICE_HINTS = {
-    "cctv": ["cctv", "camera", "surveillance"], "voip": ["voip", "phone", "pbx", "call"],
+    "cctv": ["cctv", "camera", "surveillance"], "voip": ["voip", "phone system", "pbx", "telephony"],
     "pos": ["pos", "point of sale", "booking", "reservation", "card machine"],
     "guest": ["guest", "wifi", "wi-fi"], "scada": ["scada", "telemetry", "plc"],
-    "cloud": ["cloud", "office 365", "microsoft 365", "erp", "email", "sage"],
+    "cloud": ["cloud", "office 365", "microsoft 365", "erp", "sage", "teams"],
     "intersite": ["lodges", "sites", "buildings", "link between", "site-to-site", "offices"],
     "security": ["security", "access control", "alarm", "fence"], "staff": ["staff", "accommodation"],
     "iot": ["sensor", "iot", "lorawan", "irrigation", "pump"], "safety": ["emergency", "safety"],
+    "mobility": ["mobile project", "relocat", "portable", "temporary", "move with the project", "short term"],
 }
 
 
