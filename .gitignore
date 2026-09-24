@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+*.pyo
+engine/data/snapshots/
+engine/data/kmz/
+engine/data/drafts/
+engine/data/output/
