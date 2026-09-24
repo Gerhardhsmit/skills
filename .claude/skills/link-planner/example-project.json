@@ -1,0 +1,24 @@
+{
+  "client": "Example Game Reserve",
+  "client_contact": { "name": "Reserve Manager", "email": "manager@example.com" },
+  "site": "Main Lodge backhaul",
+  "sites": {
+    "POP": { "lat": -24.3500, "lon": 31.2000, "ground_m": 420, "mast_m": 30, "note": "Fibre POP / ISP tower" },
+    "HILL": { "lat": -24.4100, "lon": 31.2700, "ground_m": 510, "mast_m": 12, "note": "Repeater koppie, solar" },
+    "LODGE": { "lat": -24.4600, "lon": 31.3300, "ground_m": 400, "mast_m": 9, "note": "Main lodge roof mast" }
+  },
+  "links": [
+    {
+      "name": "POP → Hill repeater",
+      "from": "POP", "to": "HILL",
+      "radio": { "model": "Cambium PTP 670 + 2ft dish", "freq_mhz": 5800, "tx_dbm": 18, "gain_a_dbi": 28, "gain_b_dbi": 28, "sensitivity_dbm": -78, "misc_loss_db": 2, "eirp_limit_dbm": 53 },
+      "obstructions": [ { "dist_km": 4.5, "height_m": 470, "label": "ridge + 10 m trees" } ]
+    },
+    {
+      "name": "Hill → Lodge",
+      "from": "HILL", "to": "LODGE",
+      "radio": { "model": "Cambium ePMP Force 300-25", "freq_mhz": 5500, "tx_dbm": 20, "gain_a_dbi": 25, "gain_b_dbi": 25, "sensitivity_dbm": -80, "misc_loss_db": 1, "eirp_limit_dbm": 53 },
+      "obstructions": [ { "dist_km": 6.0, "height_m": 445, "label": "tree line" } ]
+    }
+  ]
+}

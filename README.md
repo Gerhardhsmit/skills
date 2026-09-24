@@ -30,3 +30,7 @@ Technicians send this template daily before 17:00:
 *CHALLENGES / DELAYS: text or No
 *PHOTOS ATTACHED (Y/N): Y/N
 ```
+
+### `/link-planner`
+Wireless link pipeline: site assessment → link design (Fresnel, link budget) → proposal → Gmail draft to the client → execution tracking.
+Skill: `.claude/skills/link-planner/` · client jobs: `projects/<client-slug>/`
