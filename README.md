@@ -4,11 +4,14 @@ Skills for managing the OYA Wind Farm fiber optic project via WhatsApp reports.
 
 ## Skills
 
+All skills live in `.claude/skills/<name>/SKILL.md`. Claude Code picks them up automatically as `/<name>`. Tracker logic lives in scripts, so updates are fast and give the same result every time.
+
 ### `/parse-site-report`
 Paste WhatsApp daily report messages. Claude extracts all reports, updates the tracker, and shows the project dashboard.
 
 ### `/site-dashboard`
 Show the full project progress dashboard across all 18 turbines (WTG-01 to WTG-18).
+Script: `python3 .claude/skills/site-dashboard/oya.py dashboard`
 
 ## Data
 
