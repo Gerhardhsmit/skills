@@ -19,6 +19,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import assess  # noqa: E402
 import drivers  # noqa: E402
+import lpp  # noqa: E402
 from engine import (BACKHAUL_LABEL, CONF_ORDER, DEFAULT_HEIGHTS, RADII, RELAY_LABEL, Evidence, Planner,  # noqa: E402
                     backhaul_evidence, build_sites, compass, engineer, load_equipment, rejected_edges,
                     terrain_high_ground)
@@ -118,6 +119,22 @@ def run(inp, src, intel, eq):
     params = inp.get("params", {})
     out = {"slug": inp["slug"], "date": TODAY, "sources_mode": src.name, "customer": cust}
 
+    lpp_path = inp.get("inputs", {}).get("lpp")
+    if lpp_path:
+        base = inp.get("_dir", "")
+        full = lpp_path if os.path.isabs(lpp_path) else os.path.join(base, lpp_path)
+        try:
+            net = lpp.load(full)
+            findings = lpp.review(net)
+            out["lpp"] = {"net": net, "findings": findings}
+            have = {f.get("name") for f in inp["property"].get("features", [])}
+            inp["property"].setdefault("features", []).extend(f for f in lpp.to_features(net) if f["name"] not in have)
+            for f in findings:
+                ev.add(f["finding"], f["source"], "—", status=f["status"])
+            src.log.ok("Cambium LINKPlanner project", f"import {net['file']}",
+                       f"{len(net['links'])} links, {len(net['access_points'])} APs, LINKPlanner {net['app_version']}")
+        except Exception as e:  # noqa: BLE001
+            src.log.fail("Cambium LINKPlanner project", f"import {lpp_path}", str(e))
     for k in inp.get("known_facts", []):
         ev.add(k["claim"], k["source"], k.get("confidence", "Medium"), k.get("date", TODAY),
                status=k.get("status", "SOURCE-DERIVED"))
@@ -134,11 +151,20 @@ def run(inp, src, intel, eq):
     out["field_checks"] = inp.get("field_checks", [])
     out["commercial"] = inp.get("commercial", [])
     out["risks"] = inp.get("risks", [])
+    out["assessment_quote"] = inp.get("assessment_quote")
 
     pg = src.elevations([(lat, lon)])
     prop_ground = pg[0] if pg else None
     if prop_ground is not None:
         ev.add(f"Property ground elevation {prop_ground:.0f} m ASL", log.entries[-1]["source"], "Medium")
+    elif out.get("lpp"):
+        near = [x for x in out["lpp"]["net"]["links"] if x.get("ground_sm_m") is not None
+                and haversine_km(lat, lon, x["sm_lat"], x["sm_lon"]) <= 0.2]
+        if near:
+            x = min(near, key=lambda x: haversine_km(lat, lon, x["sm_lat"], x["sm_lon"]))
+            prop_ground = x["ground_sm_m"]
+            ev.add(f"Property ground elevation ~{prop_ground} m ASL (LINKPlanner profile end at '{x['sm']}', "
+                   f"{haversine_km(lat, lon, x['sm_lat'], x['sm_lon']) * 1000:.0f} m away)", out["lpp"]["net"]["file"], "Medium")
     out["property_ground_m"] = prop_ground
 
     radii = RADII.get(cust.get("area", "remote"), RADII["remote"])
@@ -215,7 +241,11 @@ def run(inp, src, intel, eq):
     out["evidence"], out["source_log"] = ev.rows, log.entries
     blocked = any(not e["ok"] for e in log.entries) and not sites
     fibre = any(k.get("kind") == "fibre" for k in inp.get("known_facts", []))
-    if route["primary"]:
+    if out.get("lpp"):
+        L_ = out["lpp"]["net"]["links"]
+        out["status"] = (f"DESIGN REVIEWED — LINKPlanner {sum(x['lp_link_ok'] for x in L_)}/{len(L_)} links pass"
+                         + ("; backhaul/mast discovery incomplete (sources unavailable)" if blocked else ""))
+    elif route["primary"]:
         out["status"] = "ROUTE FOUND"
     elif fibre:
         out["status"] = "FIBRE AVAILABLE (carrier-confirmed) — wireless route " + (
@@ -370,7 +400,11 @@ def report(o):
     need = f"{req.get('down_mbps') or '?'} / {req.get('up_mbps') or '?'} Mbps" if req.get("down_mbps") else "capacity UNKNOWN"
     because = req.get("because") or "; ".join(d["driver"] for d in c.get("drivers", [])[:3])
     L.append(f"- **Need:** {need} because {because}.")
-    if pr:
+    if o.get("lpp"):
+        ln = o["lpp"]["net"]["links"]
+        L.append(f"- **Discovered:** imported design reviewed — LINKPlanner passes {sum(x['lp_link_ok'] for x in ln)}/{len(ln)} links; "
+                 "see §6 for root causes (SOURCE-DERIVED + CALCULATED).")
+    elif pr:
         L.append(f"- **Discovered:** a {len(pr['hops'])}-hop path appears engineerable to {nb[pr['nodes'][-1]]['name']} "
                  f"({nb[pr['nodes'][-1]]['confidence']}) — CALCULATED from DEM, not field-verified.")
     elif fibre:
@@ -379,8 +413,12 @@ def report(o):
         L.append("- **Discovered:** no desk-verifiable path — survey required.")
     if failed:
         L.append(f"- **Limits:** {', '.join(failed)} unavailable — affected findings are UNKNOWN, not negative.")
-    L.append("- **Assessment:** " + ("recommend a paid Private Infrastructure Network Assessment, indicative R"
-                                     + f"{band['low']:,}–R{band['high']:,}".replace(",", " ") if band["recommend_paid_assessment"] else band["note"]))
+    if o.get("assessment_quote"):
+        L.append("- **Assessment:** already quoted at R" + f"{o['assessment_quote']['zar_excl']:,}".replace(",", " ")
+                 + " excl (FACT) — this report is its engineering core.")
+    else:
+        L.append("- **Assessment:** " + ("recommend a paid Private Infrastructure Network Assessment, indicative R"
+                                         + f"{band['low']:,}–R{band['high']:,}".replace(",", " ") if band["recommend_paid_assessment"] else band["note"]))
 
     # 2 Business requirement
     L += ["", "## 2. Business Requirement", "| Business driver | Operational requirement | Network requirement | Technical solution | Evidence |",
@@ -399,11 +437,14 @@ def report(o):
     L += ["", "## 3. Existing Environment",
           f"- **Property:** {p['lat']}, {p['lon']} ({'VERIFIED' if p.get('verified') else 'SOURCE-DERIVED'}: {p.get('source')}) — "
           f"[map](https://www.google.com/maps?q={p['lat']},{p['lon']})"
-          + (f"; ground {o['property_ground_m']:.0f} m ASL (SOURCE-DERIVED DEM)" if o.get("property_ground_m") is not None else "; ground elevation UNKNOWN"),
+          + (f"; ground ~{o['property_ground_m']:.0f} m ASL (SOURCE-DERIVED — see evidence register)" if o.get("property_ground_m") is not None else "; ground elevation UNKNOWN"),
           f"- **Boundary:** {p.get('boundary', 'BOUNDARY APPROXIMATION')}"]
+    groups = {}
     for f in p.get("features", []):
-        loc = f"{f['lat']}, {f['lon']}" if f.get("lat") is not None else "coordinates UNKNOWN — obtain"
-        L.append(f"- **{f.get('kind', 'feature')}:** {f.get('name', '')} — {loc}")
+        loc = f"{f['lat']:.5f}, {f['lon']:.5f}" if f.get("lat") is not None else "coordinates UNKNOWN — obtain"
+        groups.setdefault(f.get("kind", "feature"), []).append(f"{f.get('name', '')} ({loc})")
+    for k, v in groups.items():
+        L.append(f"- **{k} ({len(v)}):** " + "; ".join(v))
     for k, v in c.get("context", {}).items():
         if v:
             L.append(f"- **{k.replace('_', ' ')}:** {v}")
@@ -451,14 +492,33 @@ def report(o):
 
     # 6 Candidate architecture
     L += ["", "## 6. Candidate Architecture", "### Primary path"]
+    carrier_facts = [k for k in facts if k.get("kind") == "carrier"]
     L += [fmt_route(pr, nodes), "", hop_table(pr, o)] if pr else (
-        ["Carrier fibre service to the property (see §4) — no wireless path required/claimed."] if fibre else ["None established at desk."])
+        ["Carrier fibre service to the property (see §4) — no wireless path required/claimed."] if fibre else
+        (["No new backhaul path established at desk. Existing/offered carrier services:"]
+         + [f"- {k['claim']} ({k.get('status', 'SOURCE-DERIVED')})" for k in carrier_facts]) if carrier_facts
+        else ["None established at desk."])
     L += ["", "### Alternative path"]
     L += [fmt_route(alt, nodes), "", hop_table(alt, o)] if alt else ["None established at desk."]
     if o.get("distribution"):
         L += ["", "### Multi-site distribution"]
         for d in o["distribution"]:
             L += [f"**{d['name']}**"] + ([fmt_route(d["route"], nodes), "", hop_table(d["route"], o)] if d["route"] else ["No desk path — survey."])
+    if o.get("lpp"):
+        net, fnd = o["lpp"]["net"], o["lpp"]["findings"]
+        L += ["", f"### Imported design review — {net['file']} (LINKPlanner {net['app_version']}, {net['model']})"]
+        L += ["APs: " + "; ".join(f"{a['site']}: {a['product']} @ {a['height_m']} m, az {a['azimuth']:.0f}°, tilt {a['tilt'] or 0:.0f}°, "
+                                  f"{a['beamwidth']:.0f}° sector, {a['bandwidth_mhz']} MHz, {a['band']}" for a in net["access_points"]), ""]
+        L += [f"- **{f['status']}:** {f['finding']}" for f in fnd]
+        L += ["", "| Subscriber | AP | Dist | Brg (off-axis) | Elev to SM | AP gain (LP) | Ground AP/SM | Clutter | 60 % F1 clr modelled | 60 % F1 clr 5 m shrub (ASSUMED) | LINKPlanner |",
+              "|---|---|---|---|---|---|---|---|---|---|---|"]
+        dash = lambda v, fmt="{}": "–" if v is None else fmt.format(v)  # noqa: E731
+        for x in sorted(net["links"], key=lambda x: (x["ap_site"], x["distance_m"])):
+            verdict = "✅ OK" if x["lp_link_ok"] else "❌ " + ", ".join(x["lp_errors"][:3])
+            L.append(f"| {x['sm']} | {x['ap_site']} | {x['distance_m']} m | {x['bearing_from_ap']}° ({x['off_boresight_deg']:+d}°) | "
+                     f"{dash(x['lp_elev_to_sm_deg'], '{:.1f}°')} | {dash(x['lp_ap_gain_dbi'], '{:.1f} dBi')} | "
+                     f"{dash(x.get('ground_ap_m'))}/{dash(x.get('ground_sm_m'))} m | {x.get('clutter_classes', '')} {dash(x.get('clutter_height_m'))} m | "
+                     f"{dash(x.get('clr_modelled_m'))} m | {dash(x.get('clr_light_m'))} m | {verdict} |")
     cls_count = {k: sum(e["edge_class"] == k for e in o.get("graph_edges", [])) for k in assess.EDGE_CLASSES}
     L += ["", f"**Infrastructure graph:** {len(nodes)} nodes, {len(o.get('graph_edges', []))} edges analysed — "
           + (", ".join(f"{k} {v}" for k, v in cls_count.items() if v) or "no wireless edges analysed")]
@@ -471,7 +531,10 @@ def report(o):
     # 7 Terrain / LOS
     L += ["", "## 7. Terrain / LOS Analysis"]
     if not any("levation" in e["source"] and e["ok"] for e in o["source_log"]):
-        L.append("- **UNKNOWN** — no elevation source reachable. No LOS is claimed for any path.")
+        L.append("- **UNKNOWN** — no elevation source reachable for backhaul/corridor paths. No LOS is claimed for them.")
+    if o.get("lpp"):
+        L.append(f"- Distribution paths: terrain + clutter profiles from {o['lpp']['net']['file']} (SOURCE-DERIVED), re-checked "
+                 "at k=4/3 and 60 % F1 (CALCULATED) — see the design-review table in §6. Real tree heights FIELD VERIFY.")
     for rt in filter(None, [pr, alt]):
         for h in rt["hops"]:
             if "highest_obstruction" in h:
@@ -523,6 +586,9 @@ def report(o):
                 fv.append(f"{nid} {n['name']}: structure, owner/operator, height, free mounting space, power, interconnect/backhaul terms")
             elif n["role"] in ("relay", "structure"):
                 fv.append(f"{nid} {n['name']}: landowner consent, access road, power (solar), foundation, ~{n['h_design']} m mast")
+    if o.get("lpp"):
+        fv += ["Measure actual tree/thicket height at each subscriber and along paths (LINKPlanner models 15 m forest everywhere)",
+               "Confirm Tower site position, ground level and achievable mast height; set AP downtilt to the lodge cluster"]
     fv += o.get("field_checks", [])
     L += [f"- [ ] FIELD VERIFY: {x}" for x in dict.fromkeys(fv)]
 
@@ -536,7 +602,12 @@ def report(o):
     else:
         L += ["- Resolve the information gaps (§10), then re-run discovery; a field search may be needed."]
     rand = lambda v: "R" + f"{v:,}".replace(",", " ")  # noqa: E731
-    if band["recommend_paid_assessment"]:
+    if o.get("assessment_quote"):
+        q = o["assessment_quote"]
+        L += ["", f"**Assessment already quoted (FACT):** {rand(q['zar_excl'])} excl — {q.get('terms', '')}. "
+              f"Spec §13 indicative band not applied; for reference the engine would size this at "
+              f"{rand(band['low'])}–{rand(band['high'])} (INFERRED)."]
+    elif band["recommend_paid_assessment"]:
         L += ["", f"**Assessment band (indicative, spec §13):** {rand(band['low'])}–{rand(band['high'])}"
               + (" — factors: " + ", ".join(f"{k} (+{rand(v)})" for k, v in band["factors"]) if band["factors"] else " — base scope")
               + f". {band['note']}"]
@@ -643,6 +714,7 @@ def cmd_learn(a):
 def cmd_run(a):
     pdir = os.path.join(PROJECTS, a.slug) if not a.input else os.path.dirname(a.input)
     inp = json.load(open(a.input or os.path.join(pdir, "input.json")))
+    inp["_dir"] = pdir
     log = SourceLog()
     ins = inp.get("inputs", {})
     rel = lambda p: os.path.join(pdir, p) if p and not os.path.isabs(p) else p  # noqa: E731

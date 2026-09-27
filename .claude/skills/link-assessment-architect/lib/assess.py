@@ -110,7 +110,26 @@ def technology_options(o):
         if drivers & {"scada", "production", "safety"} or "99.9" in str(req.get("availability", "")):
             add("Licensed microwave (6–23 GHz)", "Carrier-grade backhaul for critical services",
                 "Protected spectrum for SCADA/POS/security SLAs; ICASA licence & lead time required")
-    if n_sites >= 3:
+    carrier = [f for f in facts if f.get("kind") == "carrier"]
+    for f in carrier:
+        if "microwave" in f["claim"].lower():
+            add("Licensed microwave to carrier site (per carrier)", "Alternative / high-capacity backhaul",
+                f["claim"][:140], "SOURCE-DERIVED")
+    if carrier and not any(f.get("kind") == "fibre" for f in facts):
+        add("Existing carrier backhaul (retain)", "Layer 2 backhaul — current",
+            carrier[0]["claim"][:120], "SOURCE-DERIVED")
+    lp = o.get("lpp")
+    if lp:
+        far = [x for x in lp["net"]["links"] if x["distance_m"] >= 250]
+        near = [x for x in lp["net"]["links"] if x["distance_m"] < 250]
+        if far:
+            add("5 GHz PMP sectors (design: " + ", ".join(sorted({a["product"] for a in lp["net"]["access_points"]})) + ")",
+                "Layer 3 distribution to remote buildings",
+                f"{len(far)} buildings 0.25–{max(x['distance_m'] for x in far) / 1000:.1f} km from the AP; one sector per cluster with correct azimuth/downtilt")
+        if near:
+            add("Cable (Cat6/fibre) or 60 GHz short links", "Lodge-core distribution",
+                f"{len(near)} buildings only {min(x['distance_m'] for x in near)}–{max(x['distance_m'] for x in near)} m from the AP — PMP is the wrong tool at this range")
+    if n_sites >= 3 and not lp:
         add("PMP distribution (Cambium PMP 450 / ePMP, Proxim)", "Layer 3 distribution",
             f"{n_sites} customer sites — one sector serves several buildings")
     elif n_sites == 2:
@@ -156,16 +175,28 @@ def layers(o):
         phys.append(f"Customer mast/roof mount ~{nodes['PROPERTY']['h_design']} m (ASSUMED)")
     if any(f.get("kind") == "fibre" for f in o.get("known_facts", [])):
         phys.append("Fibre entry, demarcation and internal cable route (FIELD VERIFY)")
-    L["1 Physical infrastructure"] = list(dict.fromkeys(phys))
+    if o.get("lpp"):
+        for ap in o["lpp"]["net"]["access_points"]:
+            phys.append(f"{ap['site']}: {ap['height_m']:g} m mount for {ap['product']} (LINKPlanner design; structure/power FIELD VERIFY)")
+    L["1 Physical infrastructure"] = list(dict.fromkeys(phys)) or ["UNKNOWN"]
     bh = []
     if any(f.get("kind") == "fibre" for f in o.get("known_facts", [])):
         bh.append("Carrier fibre service (SOURCE-DERIVED availability)")
+    for f_ in o.get("known_facts", []):
+        if f_.get("kind") == "carrier":
+            bh.append(f"{f_['claim']} ({f_.get('status', 'SOURCE-DERIVED')})")
     if pr:
         bh.append("Primary: " + " → ".join(pr["nodes"]) + f" ({len(pr['hops'])} hop(s), planning classes)")
     if alt:
         bh.append("Alternative: " + " → ".join(alt["nodes"]))
     L["2 Backhaul"] = bh or ["UNKNOWN — no backhaul path established"]
     dist = [f"{d['name']}: " + (" → ".join(d["route"]["nodes"]) if d["route"] else "no desk path") for d in o.get("distribution", [])]
+    if o.get("lpp"):
+        net = o["lpp"]["net"]
+        for ap in net["access_points"]:
+            n = sum(x["ap_site"] == ap["site"] for x in net["links"])
+            ok = sum(x["ap_site"] == ap["site"] and x["lp_link_ok"] for x in net["links"])
+            dist.append(f"PMP {ap['product']} at {ap['site']} → {n} subscribers ({ok} pass in LINKPlanner)")
     L["3 Distribution"] = dist or ["Single site — core switch/router at property"]
     access_map = {"guest": "Guest Wi-Fi (segregated SSID, captive portal)", "staff": "Staff / accommodation Wi-Fi (segregated)",
                   "cloud": "Office LAN / Wi-Fi", "voip": "Voice VLAN with QoS", "pos": "POS VLAN (isolated)",
@@ -245,27 +276,36 @@ def checklist(o):
     req = o["customer"].get("requirement", {})
     fibre = any(k.get("kind") == "fibre" for k in o.get("known_facts", []))
     near = o["infrastructure"][0] if o.get("infrastructure") else None
+    carrier = [k for k in o.get("known_facts", []) if k.get("kind") == "carrier"]
+    lp = o.get("lpp")
+    quote = o.get("assessment_quote")
     direct_blocked = [e for e in o.get("direct_candidates", []) if e["status"] in ("BLOCKED", "MARGINAL")]
     band = assessment_band(o)
+    if quote:
+        sell = "Already quoted: R" + f"{quote['zar_excl']:,}".replace(",", " ") + f" excl ({quote.get('terms', '')})"
+    elif band["recommend_paid_assessment"]:
+        sell = "Private Infrastructure Network Assessment R" + f"{band['low']:,}–R{band['high']:,}".replace(",", " ")
+    else:
+        sell = band["note"]
     return [
         ("What is the customer trying to achieve?", req.get("because") or "UNKNOWN — confirm with customer"),
-        ("What infrastructure already exists?", f"{len(o.get('infrastructure', []))} candidate site(s)"
-         + ("; carrier-confirmed fibre" if fibre else "")),
+        ("What infrastructure already exists?", f"{len(o.get('infrastructure', []))} discovered candidate site(s)"
+         + ("; carrier-confirmed fibre" if fibre else "") + "".join(f"; {k['claim'][:90]}" for k in carrier[:1])),
         ("Nearest useful infrastructure?", f"{near['name']} {near['distance_km']} km ({near['confidence']})" if near else
-         ("carrier fibre at the property" if fibre else "UNKNOWN")),
+         ("carrier fibre at the property" if fibre else "existing carrier link at the property (SOURCE-DERIVED)" if carrier else "UNKNOWN")),
         ("Shortest practical path?", " → ".join(pr["nodes"]) if pr else ("fibre" if fibre else "none established")),
         ("What terrain prevents it?", f"{len(direct_blocked)} direct path(s) blocked/marginal" if direct_blocked else
          ("not analysed (no DEM)" if not any("levation" in e["source"] and e["ok"] for e in o["source_log"]) else "none on the chosen path")),
         ("Can an intermediate mast solve it?", "yes — " + ", ".join(x for x in pr["nodes"] if x.startswith("R")) if pr and any(x.startswith("R") for x in pr["nodes"]) else "not required / not established"),
-        ("Can an existing tower solve it?", "yes — " + pr["nodes"][-1] if pr else "UNKNOWN"),
+        ("Can an existing tower solve it?", "yes — " + pr["nodes"][-1] if pr else
+         ("design uses 'Tower' site — existing or new is UNKNOWN (FIELD VERIFY)" if lp else "UNKNOWN")),
         ("Can fibre solve part of the route?", "yes (carrier-confirmed)" if fibre else "UNKNOWN — no fibre evidence"),
         ("What redundancy is required?", "; ".join(r["measure"] for r in redundancy(o))),
         ("What must be physically surveyed?", "see Field Survey Requirements"),
         ("What is commercially viable?", "carrier fibre" if fibre and not pr else
-         (f"{len(pr['hops'])}-hop private backhaul" if pr else "UNKNOWN until survey")),
-        ("What assessment should CTTX sell?", ("Private Infrastructure Network Assessment R"
-                                               + f"{band['low']:,}–R{band['high']:,}".replace(",", " ")
-                                               if band["recommend_paid_assessment"] else band["note"])),
+         (f"{len(pr['hops'])}-hop private backhaul" if pr else
+          "owned distribution + access network vs current rental — needs corrected design + supplier pricing" if lp else "UNKNOWN until survey")),
+        ("What assessment should CTTX sell?", sell),
     ]
 
 
