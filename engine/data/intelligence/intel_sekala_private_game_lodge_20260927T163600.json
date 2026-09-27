@@ -1,0 +1,81 @@
+{
+  "property": {
+    "name": "Sekala Private Game Lodge",
+    "latitude": -24.2023,
+    "longitude": 27.9025,
+    "province": "Limpopo",
+    "nearest_town": "Vaalwater",
+    "distance_to_town_km": 24.0,
+    "bearing_to_town_deg": 352.0,
+    "property_type": "lodge",
+    "accommodation_units": 6,
+    "website": "https://www.sekala.com",
+    "contact_email": "info@sekala.com",
+    "contact_phone": "+27 60 572 4559",
+    "contact_name": null,
+    "operational_notes": "Big 5 photographic safari, 5 suites + 1 villa, max 10 guests, malaria-free",
+    "connectivity_notes": "Wi-Fi listed as amenity \u2014 no infrastructure details public",
+    "elevation_m": null,
+    "source_notes": "sekala.com official site; welgevondengamereserve.org; GPS from sekala.co.za/about-us/location"
+  },
+  "infrastructure_candidates": [],
+  "terrain": {
+    "property_elevation_m": null,
+    "terrain_character": "PLATEAU",
+    "elevation_range_local": "1,080 m (north/gate area) to 1,800 m (southern plateau)",
+    "ridge_candidates": [
+      "Plateau escarpment edges within reserve (southern section)",
+      "Geelhoutkop area \u2014 1,830 m, broader Waterberg"
+    ],
+    "los_notes": "Preliminary geographic screening only. Waterberg sandstone plateau with steep valley incisions \u2014 ridge edges are natural relay candidates. Formal SRTM terrain profile required before any LOS claim.",
+    "data_source": "Wikipedia/Welgevonden public sources \u2014 elevation not surveyed",
+    "assessed": true
+  },
+  "opportunity": {
+    "primary_need": "LAST_MILE",
+    "likely_applications": [
+      "guest Wi-Fi across multiple buildings",
+      "ranger/staff comms",
+      "remote camera/CCTV",
+      "property management systems",
+      "VoIP / admin"
+    ],
+    "cluster_opportunity": true,
+    "cluster_lodges": [
+      "Makweti Safari Lodge",
+      "Ekuthuleni Lodge",
+      "Tshwene Lodge",
+      "Pitse Lodge",
+      "Clifftop Safari Hideaway"
+    ],
+    "backhaul_candidate": "WaterbergNET (Vaalwater) \u2014 WAPA/ICASA registered WISP",
+    "confidence": "MEDIUM",
+    "notes": "Welgevonden FAQ acknowledges reserve-wide connectivity issues \u2014 cluster arrangement commercially attractive if terrain allows shared backhaul."
+  },
+  "personalisation_facts": [
+    "Property geocoded: -24.2023, 27.9025",
+    "Nearest town: Vaalwater (~24 km)",
+    "Terrain: PLATEAU \u2014 1,080 m (north/gate area) to 1,800 m (southern plateau)",
+    "Lodge cluster: 5 properties in same reserve",
+    "Likely applications: guest Wi-Fi across multiple buildings, ranger/staff comms, remote camera/CCTV, property management systems, VoIP / admin",
+    "Operations: Big 5 photographic safari, 5 suites + 1 villa, max 10 guests, malaria-free"
+  ],
+  "personalisation_score": 6,
+  "quality_gate": {
+    "PROPERTY_CORRECT": true,
+    "CONTACT_CORRECT": true,
+    "LOCATION_VERIFIED": true,
+    "INFRASTRUCTURE_ANALYSED": false,
+    "TERRAIN_CHECKED": true,
+    "FACTS_SOURCED": true,
+    "NO_INVENTED_CLAIMS": true,
+    "PERSONALISATION_GE_3": true,
+    "CTA_CLEAR": true,
+    "ASSESSMENT_POSITIONING": true,
+    "READY_TO_SEND": false
+  },
+  "generated_at": "2026-09-27T16:36:00.825461",
+  "draft_email": "I'm trying to reach whoever looks after telecommunications or infrastructure at Sekala Private Game Lodge \u2014 apologies if this lands with the wrong person.\n\nMy name is Gerhard Smith from CTTX Services. We design and install private wireless infrastructure for farms, lodges, and reserves across South Africa.\n\nI did a preliminary desktop review of Sekala Private Game Lodge in Welgevonden and wanted to share what I found before reaching out.\n\nThe Waterberg terrain around the reserve ranges from roughly 1,080 m (north/gate area) to 1,800 m (southern plateau), which is classic line-of-sight territory \u2014 the plateau edges and ridgelines in the area are the kind of geography where a properly positioned relay can reach properties that satellite or standard cellular cannot serve well.\n\nVaalwater is approximately 24 km to the north. WaterbergNET operates fixed-wireless infrastructure out of Vaalwater, and the key question is whether there is a viable elevated relay point between town and the property.\n\nWelgevonden has multiple commercial lodges (Makweti Safari Lodge, Ekuthuleni Lodge, Tshwene Lodge and others) all facing the same last-mile challenge. If the terrain allows, a shared infrastructure arrangement across the reserve makes more sense technically and commercially than each property solving this independently.\n\nBeyond guest Wi-Fi, the applications worth looking at for a property like this include guest Wi-Fi across multiple buildings, ranger/staff comms, remote camera/CCTV, property management systems \u2014 the sort of backbone that makes remote management and security practical.\n\nI am not proposing a solution at this stage. The desktop review identifies whether a proper assessment is worth doing.\n\nIf connectivity across the property is something you're looking at, I'd be happy to walk you through what the preliminary desktop review found and explain what a formal infrastructure assessment would establish.\n\nA short call is usually enough to determine whether it's worth taking further.\n\nRegards,\nGerhard Smith\nCTTX Services\ngerhard@cttx.co.za\n+27 82 XXX XXXX",
+  "draft_subject": "Connectivity infrastructure \u2014 Sekala Private Game Lodge",
+  "draft_approved": false
+}
