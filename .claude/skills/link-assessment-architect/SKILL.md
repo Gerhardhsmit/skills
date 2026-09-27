@@ -84,3 +84,12 @@ Then run `learn <slug>`. Verified nodes come back as CONFIRMED in every future a
 
 ## Never
 Invent coordinates, heights, fibre, ownership, backhaul or LOS. Never treat a cell as a tower, coverage as backhaul, or a desktop result as final feasibility. Never bury uncertainty. Never stop at a plan.
+
+## Pre-sales mode — Property Intelligence + personalised outreach
+Trigger: "assess <prospect>", "prepare outreach for <property>", or any first-contact email. **Never write a generic assessment email.** The email is the last output of the intelligence, not the first.
+
+1. **Identify the property.** Resolve name clashes and gather coordinates from at least 2 independent sources, plus operational facts (units, reserve, services) and a contact verified on at least 2 sources. Look for a decision-maker name; if there's none, write the email so it can be forwarded internally. Save it all in `projects/<slug>/prospect.json`, where every fact has an `id`, `source`, evidence `status` and a `property_specific` flag.
+2. **Query the mast dataset.** `python3 lib/masts.py near <lat> <lon> 40` searches the CTTX historical mast dataset (about 13.8k sites, carrier-confidential, git-ignored in `data/private/masts/`). If the index is missing, rebuild it with `masts.py build`. Every point is **HISTORICAL**: say "a known infrastructure point about X km away", never "a working mast". Carrier names and site IDs stay internal.
+3. **Check terrain.** Nearest does not mean best. The worker screens terrain when an elevation service is reachable. Otherwise it writes `linkplanner_candidates.csv` for the CTTX Link Planner. Record who checked terrain in `terrain_checked_by`.
+4. **Write the email** from the sourced facts: an engineer's voice, South African, no marketing phrases, at least 3 property-specific facts, no LOS or feasibility claims without evidence, a specific CTA, and the assessment as the paid next step.
+5. **Run** `python3 lib/prospect.py run <slug>`. It writes `intelligence.md` (internal), `email.md`, `gate.json` and the Link Planner CSV. **Send only when the gate says READY and Gerhard approves.** Send through Microsoft 365 or Gmail, then log the send and schedule a follow-up.
