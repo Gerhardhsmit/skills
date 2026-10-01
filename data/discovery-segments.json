@@ -1,0 +1,47 @@
+{
+  "_purpose": "Discovery segments and operational signals for /opportunity-discovery. Signals are DESKTOP HYPOTHESES to research per customer, not facts about any specific company. Refine from data/learning-loop.json.",
+  "segments": [
+    {
+      "segment": "Wine farms / cellars",
+      "regions": ["Western Cape"],
+      "priority": "active",
+      "operational_signals": ["multiple vineyard blocks across valleys", "cellar + tasting room + guest accommodation on one property", "irrigation and soil-moisture monitoring", "harvest-window logistics to cellar", "export traceability", "security of equipment and stock"],
+      "likely_business_outcomes": ["grape quality at harvest", "water use efficiency", "cellar and hospitality uptime", "loss reduction"]
+    },
+    {
+      "segment": "Olive farms",
+      "regions": ["Western Cape"],
+      "priority": "active",
+      "operational_signals": ["distributed orchards", "on-farm pressing/processing", "irrigation scheduling", "remote pump and dam infrastructure"],
+      "likely_business_outcomes": ["harvest-to-press time", "water efficiency", "processing uptime"]
+    },
+    {
+      "segment": "Citrus",
+      "regions": ["Western Cape", "Eastern Cape"],
+      "priority": "active",
+      "operational_signals": ["multiple farms and blocks", "packhouse and cold chain", "export certification and traceability", "irrigation and fertigation control", "large seasonal workforce"],
+      "likely_business_outcomes": ["export pack-out", "cold-chain integrity", "irrigation efficiency", "theft reduction"]
+    },
+    {
+      "segment": "Nuts (macadamia, pecan, almond)",
+      "regions": ["Western Cape", "Eastern Cape"],
+      "priority": "active",
+      "operational_signals": ["high-value crop exposed to theft", "drying/processing facilities", "irrigation control", "distributed orchards"],
+      "likely_business_outcomes": ["crop-theft loss avoided", "processing uptime", "water efficiency"]
+    },
+    {
+      "segment": "Forestry",
+      "regions": ["Western Cape", "Eastern Cape"],
+      "priority": "active",
+      "operational_signals": ["very large dispersed plantations", "fire detection and lookout", "harvesting crews in remote compartments", "timber logistics and weighbridges"],
+      "likely_business_outcomes": ["fire response time", "crew safety and coordination", "harvest logistics efficiency"]
+    },
+    {
+      "segment": "Other distributed agricultural / operational properties",
+      "regions": ["national"],
+      "priority": "active",
+      "operational_signals": ["multiple sites under one operator", "operational technology needing backhaul", "time-critical processes", "loss exposure"],
+      "likely_business_outcomes": ["operational visibility", "resilience", "efficiency"]
+    }
+  ]
+}

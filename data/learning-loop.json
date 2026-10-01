@@ -1,0 +1,43 @@
+{
+  "_purpose": "CTTX opportunity learning loop. Every completed or progressing opportunity appends/updates one entry. Read by /opportunity-discovery and /opportunity-business-case before research. Improves the machine while the machine keeps running - never gates prospecting.",
+  "_schema": {
+    "opportunity": "Customer / property name (matches Notion CTTX Pipeline record)",
+    "region": "Province / area",
+    "industry": "Vertical, e.g. citrus, wine, forestry",
+    "industry_problem": "The industry-level problem this customer experiences",
+    "business_outcome": "Outcome the private network improves, in the customer's terms",
+    "operational_signal": "What in public information pointed to the opportunity",
+    "network_pattern": "Conceptual topology, e.g. carrier feed -> hilltop relay -> PtMP to blocks/packhouse",
+    "carrier_private_relationship": "How existing/proposed carrier service feeds the private network",
+    "objections": ["Objection raised"],
+    "responses": ["Response that worked / did not work"],
+    "decision_maker": "Role (not personal details) of the person who decides",
+    "assessment_conversion": "not_offered | offered | accepted | declined | completed",
+    "deployment_outcome": "none | quoted | won | lost | deployed",
+    "artefacts": ["Links to business case, Notion record"],
+    "lessons": ["What should change in the next opportunity"],
+    "last_updated": "YYYY-MM-DD"
+  },
+  "entries": [
+    {
+      "opportunity": "Dutoit Langkloof",
+      "region": "Langkloof, Eastern/Western Cape border",
+      "industry": "NOT VERIFIED - capture from source business case",
+      "industry_problem": "NOT CAPTURED - source document not located in Notion/Drive/Gmail on 2026-10-01",
+      "business_outcome": "NOT CAPTURED",
+      "operational_signal": "NOT CAPTURED",
+      "network_pattern": "NOT CAPTURED",
+      "carrier_private_relationship": "NOT CAPTURED",
+      "objections": [],
+      "responses": [],
+      "decision_maker": "NOT CAPTURED",
+      "assessment_conversion": "NOT CAPTURED",
+      "deployment_outcome": "NOT CAPTURED",
+      "artefacts": [],
+      "lessons": [
+        "Reference pattern: six-section business case (outcome drivers, operational journey, what changes, network concept, how it connects, how CTTX starts and proves it) with Private Infrastructure Network Assessment as CTA."
+      ],
+      "last_updated": "2026-10-01"
+    }
+  ]
+}

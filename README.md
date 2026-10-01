@@ -1,4 +1,20 @@
-# OYA Project — Claude Code Skills
+# CTTX — Claude Code Skills
+
+## Sales engine (Dutoit reference pattern)
+
+The Dutoit Langkloof business case is the reference pattern for turning an opportunity into a private-network business case:
+
+CUSTOMER OPERATION → BUSINESS PROBLEM → ECONOMIC / OPERATIONAL CONSEQUENCE → PRIVATE NETWORK OPPORTUNITY → CUSTOMER-SPECIFIC NETWORK CONCEPT → PROOF / ASSESSMENT → DEPLOYMENT
+
+### `/opportunity-discovery`
+Continuous national/regional discovery (Western Cape is an active priority: wine, olives, citrus, nuts, forestry). Scores on operational signal. Existing connectivity is never a negative score. Never pauses while other deals wait.
+
+### `/opportunity-business-case`
+Customer-specific homework → six-section business case → Private Infrastructure Network Assessment CTA → Notion + learning-loop record.
+
+Data: `data/learning-loop.json` (learning loop), `data/discovery-segments.json` (segment signals).
+
+## OYA Project
 
 Skills for managing the OYA Wind Farm fiber optic project via WhatsApp reports.
 
