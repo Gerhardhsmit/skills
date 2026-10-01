@@ -22,9 +22,11 @@ import zipfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from geo import bearing_deg, haversine_km  # noqa: E402
 
-REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", ".."))
-DEFAULT_DIR = os.path.join(REPO, "data", "private", "masts")
-INDEX = os.path.join(DEFAULT_DIR, "mast_index.json")
+import paths  # noqa: E402
+
+DEFAULT_DIR = paths.mast_kmz_dir() or paths.MAST_WRITE_DIR
+INDEX = paths.mast_index()
+WRITE_INDEX = os.path.join(paths.MAST_WRITE_DIR, "mast_index.json")
 
 
 def _kml_text(path):
@@ -80,8 +82,9 @@ def build(kmz_dir=DEFAULT_DIR):
             sites[sid] = {"id": sid, "name": a["name"], "lat": a["lat"], "lon": a["lon"], "service_level": None,
                           "bs_number": None, "source": a["source"], "status": "HISTORICAL", "attrs": a}
     out = [s for s in sites.values() if s["lat"] is not None and s["lon"] is not None and -35.5 < s["lat"] < -21.5]
-    os.makedirs(os.path.dirname(INDEX), exist_ok=True)
-    with open(INDEX, "w") as f:
+    target = INDEX if os.access(os.path.dirname(INDEX) or ".", os.W_OK) else WRITE_INDEX
+    os.makedirs(os.path.dirname(target), exist_ok=True)
+    with open(target, "w") as f:
         json.dump({"built_from": sorted(os.path.basename(p) for p in glob.glob(os.path.join(kmz_dir, "*.km[lz]"))),
                    "count": len(out), "enriched": sum("attrs" in s for s in out), "sites": out}, f)
     return len(out), sum("attrs" in s for s in out)
@@ -90,14 +93,20 @@ def build(kmz_dir=DEFAULT_DIR):
 _CACHE = {}
 
 
-def load(path=INDEX):
+def load(path=None):
+    path = path or (INDEX if os.path.exists(INDEX) else WRITE_INDEX)
+    if not os.path.exists(path):
+        if not paths.mast_kmz_dir():
+            raise FileNotFoundError("No mast dataset: put the carrier KMZs in data/masts/ (skill) or set CTTX_MAST_DIR")
+        build(paths.mast_kmz_dir())  # auto-build on first use
+        path = WRITE_INDEX if os.path.exists(WRITE_INDEX) else INDEX
     if path not in _CACHE:
         with open(path) as f:
             _CACHE[path] = json.load(f)["sites"]
     return _CACHE[path]
 
 
-def near(lat, lon, radius_km=40, n=15, path=INDEX):
+def near(lat, lon, radius_km=40, n=15, path=None):
     dlat = radius_km / 111.0
     dlon = radius_km / (111.0 * max(0.2, math.cos(math.radians(lat))))
     hits = []

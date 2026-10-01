@@ -26,9 +26,7 @@ from engine import (BACKHAUL_LABEL, CONF_ORDER, DEFAULT_HEIGHTS, RADII, RELAY_LA
 from geo import bearing_deg, haversine_km, parse_location  # noqa: E402
 from sources import FixtureSources, IntelGraph, LiveSources, SourceLog  # noqa: E402
 
-REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", ".."))
-PROJECTS = os.path.join(REPO, "projects")
-INTEL = os.path.join(REPO, "data", "intelligence-graph.json")
+from paths import INTEL, PROJECTS, WORK as REPO  # noqa: E402
 TODAY = datetime.date.today().isoformat()
 
 
@@ -173,6 +171,14 @@ def run(inp, src, intel, eq):
              verified=k.get("status") == "VERIFIED" or k.get("verified", False),
              kind=k.get("kind", "") + (" mast" if k.get("kind") in ("carrier_mast", "fibre_pop", "exchange", "datacentre", "cttx") else ""))
         for k in inp.get("known_infrastructure", []) if k.get("lat") is not None]
+    if inp.get("inputs", {}).get("use_masts", True) and src.name == "live":
+        try:
+            import masts
+            hits = masts.near(lat, lon, max(radii), 40)
+            user_pts += masts.to_user_points(hits)
+            log.ok("CTTX mast dataset (historical)", f"near {max(radii)} km", f"{len(hits)} sites")
+        except Exception as e:  # noqa: BLE001
+            log.fail("CTTX mast dataset (historical)", "query", str(e))
     rounds = []
     result = None
     for r in radii:
@@ -199,6 +205,7 @@ def run(inp, src, intel, eq):
         if route["primary"] and (route["alternative"] or dense):
             break  # adaptive stop: viable route + alternative (or dense area where the first hit is enough)
     r, sites, high, corridors, route, osm, cells = result
+    memo = route.pop("_memo", {})
     out["search"] = {"rounds": rounds, "final_radius_km": r}
 
     # evidence for infrastructure
@@ -237,7 +244,7 @@ def run(inp, src, intel, eq):
     ev.add(f"Clutter allowance {params.get('clutter_m', 0)} m (DEM excludes trees/buildings)", "input params", "—", status="ASSUMED")
     ev.add("Radio parameters from planning classes, not datasheets", "equipment-library.json", "—", status="ASSUMED")
     out["all_corridors"] = corridors
-    out["mast_candidates"] = assess.mast_candidates(dict(out, nodes=route["nodes"]), route.pop("_memo"))
+    out["mast_candidates"] = assess.mast_candidates(dict(out, nodes=route["nodes"]), memo)
     out["evidence"], out["source_log"] = ev.rows, log.entries
     blocked = any(not e["ok"] for e in log.entries) and not sites
     fibre = any(k.get("kind") == "fibre" for k in inp.get("known_facts", []))
@@ -245,6 +252,8 @@ def run(inp, src, intel, eq):
         L_ = out["lpp"]["net"]["links"]
         out["status"] = (f"DESIGN REVIEWED — LINKPlanner {sum(x['lp_link_ok'] for x in L_)}/{len(L_)} links pass"
                          + ("; backhaul/mast discovery incomplete (sources unavailable)" if blocked else ""))
+    elif route["primary"] and any(h["status"] == "UNVERIFIED" for h in route["primary"]["hops"]):
+        out["status"] = "CANDIDATE ROUTE — terrain UNVERIFIED (no elevation data); no LOS claimed"
     elif route["primary"]:
         out["status"] = "ROUTE FOUND"
     elif fibre:
@@ -404,6 +413,9 @@ def report(o):
         ln = o["lpp"]["net"]["links"]
         L.append(f"- **Discovered:** imported design reviewed — LINKPlanner passes {sum(x['lp_link_ok'] for x in ln)}/{len(ln)} links; "
                  "see §6 for root causes (SOURCE-DERIVED + CALCULATED).")
+    elif pr and any(h["status"] == "UNVERIFIED" for h in pr["hops"]):
+        L.append(f"- **Discovered:** candidate {len(pr['hops'])}-hop path to {nb[pr['nodes'][-1]]['name']} "
+                 f"({nb[pr['nodes'][-1]]['confidence']}) — terrain UNVERIFIED (no elevation data); **no LOS is claimed**.")
     elif pr:
         L.append(f"- **Discovered:** a {len(pr['hops'])}-hop path appears engineerable to {nb[pr['nodes'][-1]]['name']} "
                  f"({nb[pr['nodes'][-1]]['confidence']}) — CALCULATED from DEM, not field-verified.")

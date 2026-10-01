@@ -23,7 +23,7 @@ import masts  # noqa: E402
 from engine import analyse_link  # noqa: E402
 from sources import LiveSources, SourceLog  # noqa: E402
 
-REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", ".."))
+from paths import PROJECTS  # noqa: E402
 TODAY = datetime.date.today().isoformat()
 BANNED = ["leading provider", "cutting-edge", "cutting edge", "seamless", "revolutionary", "best-in-class",
           "best in class", "we specialise", "we specialize", "valued customer", "pleased to introduce",
@@ -50,7 +50,7 @@ def terrain_screen(prop, cands, src):
 
 
 def run(slug):
-    pdir = os.path.join(REPO, "projects", slug)
+    pdir = os.path.join(PROJECTS, slug)
     p = json.load(open(os.path.join(pdir, "prospect.json")))
     loc = p["property"]["location"]
     log = SourceLog()

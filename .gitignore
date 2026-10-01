@@ -1,6 +1,8 @@
 __pycache__/
-.claude/skills/link-assessment-architect/tests/output/
+.claude/skills/cttx-link-assessment-architect/tests/output/
 projects/*
 !projects/.gitkeep
 data/intelligence-graph.json
 data/private/
+dist/
+.claude/skills/cttx-link-assessment-architect/reference/private-casebook.md
