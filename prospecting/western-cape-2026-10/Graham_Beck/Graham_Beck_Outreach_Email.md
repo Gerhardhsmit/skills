@@ -13,7 +13,7 @@ For the attention of Ms Helen Kock, CEO
 
 Dear Ms Kock,
 
-Congratulations on your first year leading Beck Family Estates.
+As you near your first year leading Beck Family Estates, congratulations on the role.
 
 You have spoken about protecting the intrinsic value of the brands and deepening sustainability. At Madeba, much of that value is spread across one estate. Up to five years of Cap Classique sits on its lees in the cellar. Four hundred hectares of vines run on a strict water budget. A WWF Conservation Champion reserve carries the sustainability story to your export markets.
 
