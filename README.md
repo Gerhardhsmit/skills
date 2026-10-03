@@ -30,3 +30,17 @@ Technicians send this template daily before 17:00:
 *CHALLENGES / DELAYS: text or No
 *PHOTOS ATTACHED (Y/N): Y/N
 ```
+
+---
+
+# CTTX Outreach Engine (`.claude/skills/cttx-outreach-engine/`)
+
+Sales manager's autonomous loop for Eastern Cape / Western Cape outreach: batch selection from CTTX
+Pipeline → business-first discovery → owner contact discovery → carrier + private backbone concept →
+gate → SIGNAL brief + owner email **draft** → Notion log → anonymised insight to Buffer.
+Orchestrates the existing claude.ai skills (`cttx-private-network-discovery-strategy`,
+`cttx-link-assessment-architect`, quoting). Draft-only; never sends.
+
+**This repo is public.** Prospect data, emails, records and briefs never go in here — Notion only.
+
+Run tests: `python3 .claude/skills/cttx-outreach-engine/tests/test_engine.py`
