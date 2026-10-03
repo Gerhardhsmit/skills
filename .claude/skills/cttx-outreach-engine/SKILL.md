@@ -127,7 +127,17 @@ several farms, reserves with several lodges, plantations, wind farms). For a lar
 3. The plan states its limits on the page: public elevation data, planning-class radios, pins marked
    estimated, relay sites "candidate — field verify", hubs not yet studied.
 4. Send `links.kml` with the draft (Abel's LINKPlanner and the client's Google Earth both open it).
-5. A large site with no pins for its main sites FAILS the gate: research the pins (listings, Maps,
+5. **Established multi-site businesses get the hybrid page** (Gerhard, 3 Oct 2026): dedicated Vodacom
+   Business Connect links from the mast into the hub (+ a backup from a different mast) plus the owned
+   backbone, drawn as one picture. Build `prices.json` at run time from Notion "💰 Vodacom Products &
+   Pricing" (current AAG table, 36 m client price ex VAT at the recommended markup, NRC) — never commit
+   it — and run `python3 lib/hybrid_offer.py plan.json prices.json --primary <Mbps> --backup <Mbps>
+   --area "<area>"`. The page states the break-even ("if your N sites pay more than R X a month today,
+   this costs less on the carrier side"), never "we beat your provider" until their spend is known.
+   Backbone CAPEX comes from `infrastructure-project-quoting-estimation` after the site walk. Next
+   action: a feasibility request to the Vodacom partner manager for each carrier landing pin (draft).
+   The proposal also carries the required **Cost of Disconnection vs Value of Connected Operations**.
+6. A large site with no pins for its main sites FAILS the gate: research the pins (listings, Maps,
    company pages, satellite) — never send a large-site brief without its link plan.
 
 ## Step 5–6 — Gate and package
@@ -163,6 +173,7 @@ EMAIL INTEGRATION status, and one line **Next action: …**.
 | `lib/batch_rank.py` | Dedupe + rank pipeline rows into a batch |
 | `lib/contact_finder.py` | Email pattern inference and candidate ranking (stdlib only) |
 | `lib/site_workup.py` | One-command large-site workup: relays, backbone, carrier handover, plan pages, imagery |
+| `lib/hybrid_offer.py` | Hybrid page: carrier + owned backbone diagram, carrier MRC, break-even (prices loaded at run time) |
 | `lib/site_imagery.py` | Sentinel-2 views of the site area and relay crests (needs rasterio) |
 | `references/site-workup.md` | Site workup procedure + Google Earth checklist for relay crests |
 | `lib/terrain_screen.py` | Desk-study terrain/Fresnel screen + relay search (stdlib, AWS terrain tiles) |

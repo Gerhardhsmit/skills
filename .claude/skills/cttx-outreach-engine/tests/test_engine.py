@@ -10,6 +10,7 @@ import contact_finder as cf  # noqa: E402
 import write_eml  # noqa: E402
 import terrain_screen as ts  # noqa: E402
 import site_workup  # noqa: E402
+import hybrid_offer  # noqa: E402
 
 
 class ContactFinder(unittest.TestCase):
@@ -161,6 +162,21 @@ class SiteWorkupTest(unittest.TestCase):
         self.assertIsNotNone(out["carrier_primary"])
         for f in ("plan.json", "carrier.json", "plan.html", "screen.txt", "plan_out/links.kml"):
             self.assertTrue(os.path.exists(os.path.join(self.tmp, f)), f)
+
+
+
+class HybridOfferTest(unittest.TestCase):
+    PRICES = {"term_months": 36, "business_connect_client_ex_vat": {"50": 100.0, "200": 300.0}, "nrc_client_ex_vat": 10.0}
+    PLAN = {"sites": {"A": {"role": "hub"}, "B": {"role": "site"}, "R": {"role": "relay"}, "C1": {"role": "carrier"}},
+            "links": [{"a": "C1", "b": "A", "role": "carrier option"}, {"a": "R", "b": "A", "role": "backbone"},
+                      {"a": "R", "b": "B", "role": "backbone"}]}
+
+    def test_cost_and_breakeven(self):
+        c, html = hybrid_offer.page(self.PLAN, self.PRICES, 200, 50, 2, "Test Valley")
+        self.assertEqual(c["mrc_ex_vat"], 400.0)
+        self.assertEqual(c["nrc_ex_vat"], 20.0)
+        self.assertIn("2 Test Valley sites together pay more than", html)
+        self.assertNotIn("beat", html.lower())
 
 
 if __name__ == "__main__":
