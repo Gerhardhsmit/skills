@@ -163,7 +163,8 @@ def plan(p):
         c = {**PLAN_CLASS, **ln.get("radio", {})}   # per-hop override, e.g. {"gain_dbi": 29} for a 2 ft dish
         r = screen((A["lat"], A["lon"]), (B["lat"], B["lon"]), A["h"], B["h"], c["freq_mhz"] / 1000)
         bud = budget(r["km"], c)
-        rows.append({**ln, **r, **bud, "gain_dbi": c["gain_dbi"], "az_a": round(bearing((A["lat"], A["lon"]), (B["lat"], B["lon"]))),
+        rows.append({**ln, **r, **bud, "gain_dbi": c["gain_dbi"], "lat_far": B["lat"] if B.get("role") == "carrier" else A["lat"],
+                     "lon_far": B["lon"] if B.get("role") == "carrier" else A["lon"], "az_a": round(bearing((A["lat"], A["lon"]), (B["lat"], B["lon"]))),
                      "az_b": round(bearing((B["lat"], B["lon"]), (A["lat"], A["lon"]))),
                      "pass": r["verdict"] == "CLEAR" and bud["fade_db"] >= MIN_FADE_DB})
     return rows
@@ -186,6 +187,12 @@ def profile_svg(row, w=520, h=150):
 
 
 def map_svg(p, rows, w=520, h=340):
+    # a far-off backup carrier point would shrink the hub to a dot: list it in a corner note instead
+    far = {r["a"] if p["sites"][r["a"]].get("role") == "carrier" else r["b"]: r for r in rows if r.get("role") == "carrier backup"}
+    p = {"sites": {n: s for n, s in p["sites"].items() if n not in far}}
+    notes = [f'{n}: {r["km"]} km {compass(bearing((p["sites"][r["b"] if r["a"] == n else r["a"]]["lat"], p["sites"][r["b"] if r["a"] == n else r["a"]]["lon"]), (r_site["lat"], r_site["lon"])))} of {r["b"] if r["a"] == n else r["a"]}'
+             for n, r in far.items() for r_site in [{"lat": r["lat_far"], "lon": r["lon_far"]}]]
+    rows = [r for r in rows if r.get("role") != "carrier backup"]
     pts = [(s["lat"], s["lon"]) for s in p["sites"].values()]
     la0, la1 = min(x for x, _ in pts), max(x for x, _ in pts); lo0, lo1 = min(y for _, y in pts), max(y for _, y in pts)
     kx = math.cos(math.radians((la0 + la1) / 2))
@@ -198,14 +205,21 @@ def map_svg(p, rows, w=520, h=340):
         col = "#1f8a4c" if r["pass"] else "#c0392b"; dash = ' stroke-dasharray="6 4"' if r.get("role") == "backup" else ""
         out.append(f'<line x1="{X(A["lon"]):.1f}" y1="{Y(A["lat"]):.1f}" x2="{X(B["lon"]):.1f}" y2="{Y(B["lat"]):.1f}" stroke="{col}" stroke-width="3"{dash}/>')
     for n, s in p["sites"].items():
-        shape = "#e0a100" if s.get("role") == "relay" else "#1d2b3a"
+        shape = {"relay": "#e0a100", "carrier": "#c0392b"}.get(s.get("role"), "#1d2b3a")
         out.append(f'<circle cx="{X(s["lon"]):.1f}" cy="{Y(s["lat"]):.1f}" r="6" fill="{shape}" stroke="#fff" stroke-width="1.5"/>'
                    f'<text class="txt" x="{X(s["lon"])+9:.1f}" y="{Y(s["lat"])+4:.1f}" font-size="11">{n}</text>')
     # 1 km scale bar
     px = sc / 111.32
     out.append(f'<line x1="20" y1="{h-15}" x2="{20+px:.1f}" y2="{h-15}" stroke="#333" stroke-width="2" class="ink"/><text class="txt" x="20" y="{h-20}" font-size="9">1 km</text>'
-               f'<text class="txt" x="{w-10}" y="{h-8}" font-size="9" text-anchor="end">N ↑</text></svg>')
+               f'<text class="txt" x="{w-10}" y="{h-8}" font-size="9" text-anchor="end">N ↑</text>')
+    for i, t in enumerate(notes):
+        out.append(f'<text class="txt" x="{w-10}" y="{16 + 12 * i}" font-size="9" text-anchor="end">{t} (dashed in KML)</text>')
+    out.append("</svg>")
     return "".join(out)
+
+
+def compass(b):
+    return ["N", "NE", "E", "SE", "S", "SW", "W", "NW"][int((b + 22.5) // 45) % 8]
 
 
 def kml(p, rows):

@@ -203,8 +203,10 @@ def workup(sites, out, imagery=True, carrier_km=25, max_hop_km=15):
     if imagery:
         try:
             import site_imagery as si
-            pts = {n: {"lat": s["lat"], "lon": s["lon"], "kind": s.get("role")} for n, s in plan["sites"].items()}
-            lk = [{"a": l["a"], "b": l["b"], "role": l["role"]} for l in plan["links"]]
+            # the backup carrier point can be far away; leave it off the picture so the hub stays readable
+            pts = {n: {"lat": s["lat"], "lon": s["lon"], "kind": s.get("role")} for n, s in plan["sites"].items()
+                   if n != "Carrier point B"}
+            lk = [{"a": l["a"], "b": l["b"], "role": l["role"]} for l in plan["links"] if l["a"] in pts and l["b"] in pts]
             sc = si.render(pts, lk, os.path.join(out, "sat.png"))
             imgs.append(f"sat.png (Sentinel-2 {sc['date']}, cloud {sc['cloud']}%)")
             for n, s in plan["sites"].items():

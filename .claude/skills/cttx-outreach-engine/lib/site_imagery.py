@@ -71,6 +71,7 @@ def render(points, links, out_png, pad_km=1.5, days=90, scale=4):
         wt = src.window_transform(win)
     img = Image.fromarray(arr.transpose(1, 2, 0)).resize((arr.shape[2] * scale, arr.shape[1] * scale), Image.LANCZOS)
     d = ImageDraw.Draw(img)
+    lw = max(3, img.width // 300); r0 = max(7, img.width // 160)
     px = lambda n: ((xy[n][0] - wt.c) / wt.a * scale, (xy[n][1] - wt.f) / wt.e * scale)
     for ln in links:
         col = (40, 200, 110) if ln.get("ok", True) else (230, 70, 60)
@@ -79,16 +80,16 @@ def render(points, links, out_png, pad_km=1.5, days=90, scale=4):
             n = 24
             for i in range(0, n, 2):
                 d.line([a[0] + (b[0] - a[0]) * i / n, a[1] + (b[1] - a[1]) * i / n,
-                        a[0] + (b[0] - a[0]) * (i + 1) / n, a[1] + (b[1] - a[1]) * (i + 1) / n], fill=col, width=4)
+                        a[0] + (b[0] - a[0]) * (i + 1) / n, a[1] + (b[1] - a[1]) * (i + 1) / n], fill=col, width=lw)
         else:
-            d.line([a, b], fill=col, width=4)
+            d.line([a, b], fill=col, width=lw)
     colours = {"relay": (240, 170, 0), "carrier": (230, 70, 60)}
     for n, p in points.items():
         if p.get("kind") == "hidden":
             continue
         x, y = px(n); c = colours.get(p.get("kind"), (255, 255, 255))
-        d.ellipse([x - 8, y - 8, x + 8, y + 8], fill=c, outline=(0, 0, 0), width=2)
-        d.text((x + 11, y - 7), n, fill=(255, 255, 255), stroke_width=2, stroke_fill=(0, 0, 0))
+        d.ellipse([x - r0, y - r0, x + r0, y + r0], fill=c, outline=(0, 0, 0), width=2)
+        d.text((x + r0 + 4, y - 7), n, fill=(255, 255, 255), stroke_width=2, stroke_fill=(0, 0, 0))
     bar = 1000 / wt.a * scale
     d.line([20, img.height - 20, 20 + bar, img.height - 20], fill=(255, 255, 255), width=3)
     d.text((20, img.height - 36), "1 km", fill=(255, 255, 255), stroke_width=2, stroke_fill=(0, 0, 0))
