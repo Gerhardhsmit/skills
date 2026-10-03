@@ -68,7 +68,27 @@ def completeness(row):
     return sum(1 for k in ("Contact Person", "Email", "Website", "Pain Signal", "Town", "Role") if row.get(k))
 
 
-def rank(rows, size=5, balance=True):
+def _domain(url_or_email):
+    s = (url_or_email or "").lower().strip()
+    if "@" in s:
+        s = s.split("@", 1)[1]
+    s = re.sub(r"^https?://", "", s).split("/")[0]
+    return s[4:] if s.startswith("www.") else s
+
+
+def is_contacted(row, contacted):
+    """contacted: set of lowercase domains and/or normalised company names seen in Gmail threads."""
+    if not contacted:
+        return False
+    keys = {_domain(row.get("Email")), _domain(row.get("Website")), norm_company(row.get("Company"))}
+    return bool(keys - {""} & contacted)
+
+
+def rank(rows, size=5, balance=True, contacted=None):
+    contacted = {c.strip().lower() for c in (contacted or []) if c.strip()}
+    contacted |= {norm_company(c) for c in list(contacted) if "." not in c}
+    warm = [r for r in rows if is_contacted(r, contacted)]
+    rows = [r for r in rows if not is_contacted(r, contacted)]
     groups = {}
     for r in rows:
         groups.setdefault(norm_company(r.get("Company")), []).append(r)
@@ -109,6 +129,9 @@ def rank(rows, size=5, balance=True):
                                "task": "Name 5 real businesses in this segment and add them as pipeline rows"}
                               for r in prospecting],
         "duplicates": duplicates,
+        "warm": [{"company": r.get("Company"), "url": r.get("url"),
+                  "task": "Prior contact in Gmail: route to reply desk, update Stage; never cold-pitch"}
+                 for r in warm],
     }
 
 
@@ -117,11 +140,13 @@ def main(argv=None):
     ap.add_argument("rows")
     ap.add_argument("--size", type=int, default=5)
     ap.add_argument("--no-balance", action="store_true")
+    ap.add_argument("--contacted", help="file of domains/company names already in Gmail threads, one per line")
     a = ap.parse_args(argv)
     with open(a.rows) as f:
         data = json.load(f)
     rows = data.get("results", data) if isinstance(data, dict) else data
-    print(json.dumps(rank(rows, a.size, not a.no_balance), indent=2, ensure_ascii=False))
+    contacted = open(a.contacted).read().splitlines() if a.contacted else []
+    print(json.dumps(rank(rows, a.size, not a.no_balance, contacted), indent=2, ensure_ascii=False))
     return 0
 
 

@@ -1,6 +1,7 @@
 # Cadence — how the engine runs without Gerhard driving it
 
 ## Daily (weekdays, scheduled Routine in a fresh cloud session)
+0. Reply desk + stage reconciliation (SKILL.md Step 0) — live conversations first, always.
 1. Run the engine on a batch of 5 EC/WC prospects (Steps 1–9 of SKILL.md).
 2. Check Follow-Ups Due (`Next Action Date` ≤ today) and prepare follow-up DRAFTS for rows where
    Gerhard has sent (Stage = Contacted) and no reply exists in Gmail (search the thread first).

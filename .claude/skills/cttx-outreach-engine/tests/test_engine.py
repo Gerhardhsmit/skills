@@ -78,6 +78,13 @@ class BatchRank(unittest.TestCase):
         out = batch_rank.rank(self.ROWS, size=2)
         self.assertEqual({b["province"] for b in out["batch"]}, {"Western Cape", "Eastern Cape"})
 
+    def test_contacted_excluded_and_returned_warm(self):
+        out = batch_rank.rank(self.ROWS, size=5, contacted=["beta.co.za", "Gamma Wind Farm"])
+        urls = [b["url"] for b in out["batch"]]
+        self.assertNotIn("u3", urls)
+        self.assertNotIn("u5", urls)
+        self.assertEqual(sorted(w["url"] for w in out["warm"]), ["u3", "u5"])
+
     def test_email_kind(self):
         self.assertEqual(batch_rank.email_kind("reservations@x.co.za"), "generic")
         self.assertEqual(batch_rank.email_kind("jan@x.co.za"), "named")

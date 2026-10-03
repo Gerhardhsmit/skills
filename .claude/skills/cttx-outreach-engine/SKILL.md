@@ -42,11 +42,28 @@ CTTX Pipeline (Notion)  ──► 1 SELECT batch (lib/batch_rank.py)
   decision-maker of a prospect whose gate already passes. Default cap: 2 per prospect, 10 per run.
   Surface every spend (estimated, actual, new balance).
 
+## Step 0 — Reply desk and reconciliation (ALWAYS FIRST — before any new research)
+Live conversations beat new names. The first live run (3 Oct 2026) found 7 replies to the 25–28 Sep
+wave sitting unanswered while the pipeline still showed those prospects as "Not Contacted", and the
+engine re-researched a warm lead (Buffalo Kloof) as if it were cold. Never again:
+1. **Reply desk.** Gmail: `newer_than:14d -from:gerhard@cttx.co.za` threads whose first message is from
+   gerhard@cttx.co.za (Gerhard cc's himself, so his sends are visible). For every thread where the
+   prospect spoke last: summarise what they asked, draft the reply (DRAFT only — answer their actual
+   question, give one concrete next step), and list it at the top of the run report as **Live
+   conversations**. A meeting already offered outranks everything else in the report.
+2. **Reconcile stages.** Every sent thread → the prospect's pipeline row gets `Stage` = Contacted
+   (or Replied if they answered) and `Last Contact` = the date. This is the one case where the engine
+   moves Stage, because the evidence is in the mailbox. Write the domains into `contacted.txt`.
+3. **Duplicate-send check.** Two identical sends to one address within minutes → flag in the report
+   (it means an outbound worker double-fired); never draft a third.
+4. Only then go to Step 1, passing `--contacted contacted.txt` so warm prospects are never re-pitched cold.
+
 ## Step 1 — Select the batch
 1. Query CTTX Pipeline (data source `collection://e2cdd4da-b824-4188-9f31-24365a3c8e0c`):
    `Province IN ('Eastern Cape','Western Cape') AND Stage = 'Not Contacted'` plus rows whose
    `Next Action Date` ≤ today.
-2. Save the rows as JSON and run `python3 lib/batch_rank.py rows.json --size 5` — it de-duplicates by
+2. Save the rows as JSON and run `python3 lib/batch_rank.py rows.json --size 5 --contacted contacted.txt`
+   (domains or company names already in a Gmail thread are excluded and returned as `warm`) — it de-duplicates by
    normalised company name, skips placeholder rows ("TBC", generic segment rows such as
    "Gamtoos Valley Agricultural Operations"), and ranks by priority, named decision-maker, sector fit,
    evidence already on the row and EC/WC balance. Placeholder segment rows are returned separately as
@@ -55,7 +72,10 @@ CTTX Pipeline (Notion)  ──► 1 SELECT batch (lib/batch_rank.py)
 
 ## Step 2 — Discover (per prospect)
 Run `cttx-private-network-discovery-strategy` at **Full** tier: Phase 0 (Notion, Gmail, Drive for prior
-contact) through Phase 8. Parallelise prospects with sub-agents when available; each worker gets one
+contact) through Phase 8. **Phase 0 is a hard stop, not a formality:** search Gmail for the company
+name, the domain, and every person's name/address before any research. Any hit → stop, return the
+thread to the orchestrator as WARM, no cold draft. Workers must report "Phase 0: searched <queries>,
+found <n> threads" in their return. Parallelise prospects with sub-agents when available; each worker gets one
 prospect and the rules above. Prior contact found in Phase 0 changes the draft — never cold-pitch a
 warm relationship.
 
