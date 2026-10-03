@@ -7,6 +7,7 @@ import unittest
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "lib"))
 import batch_rank  # noqa: E402
 import contact_finder as cf  # noqa: E402
+import write_eml  # noqa: E402
 
 
 class ContactFinder(unittest.TestCase):
@@ -43,6 +44,18 @@ class ContactFinder(unittest.TestCase):
     def test_accents(self):
         first, last = cf.split_name("Ané Müller")
         self.assertEqual((first, last), ("ane", ["muller"]))
+
+
+class WriteEml(unittest.TestCase):
+    def test_loader_convention(self):
+        import datetime as dt
+        d = {"to": "a@x.co.za", "subject": "S", "body": "B", "attachments": ["Brief.pdf"],
+             "prospect": "Alpha", "contact_name": "Anna Botha", "email_status": "INFERRED"}
+        m = write_eml.build(d)
+        self.assertEqual(m["X-CTTX-Attach"], "Brief.pdf")
+        self.assertTrue(m["Subject"].startswith("[VERIFY ADDRESS]"))
+        self.assertEqual(write_eml.eml_name("Alpha", "Anna Botha", dt.date(2026, 10, 3)),
+                         "Alpha - DRAFT_Anna_Botha_Assessment_20261003.eml")
 
 
 class BatchRank(unittest.TestCase):

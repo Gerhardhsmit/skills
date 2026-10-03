@@ -26,10 +26,12 @@ CTTX Pipeline (Notion)  ──► 1 SELECT batch (lib/batch_rank.py)
 - **Research each prospect as itself.** Batch mode never means template mode. Each prospect gets its own
   discovery; sector skills are toolsets selected after discovery.
 - **Draft only. Gerhard sends.** The engine never sends email and never asks to.
-- **Email path:** drafts belong in Outlook under gerhard@cttx.co.za. From a cloud session this cannot be
-  reached, so drafts are written as files + JSON and pushed into Outlook on Gerhard's PC with
-  `tools/push_outlook_drafts.ps1` (Outlook COM, creates drafts, never sends). Until that has run and the
-  draft is seen under gerhard@cttx.co.za → Drafts, report **EMAIL INTEGRATION NOT VERIFIED**.
+- **Email path:** drafts belong in Outlook under gerhard@cttx.co.za. Use the EXISTING loader —
+  "Load CTTX Drafts" (`outbound-communication/load_drafts.py`, Gerhardhsmit/cttx-infrastructure-intelligence),
+  which loads `.eml` files from `Desktop\CTTX Prospect Drafts` into Drafts and never sends. The engine
+  writes each draft with `lib/write_eml.py` (loader naming + `X-CTTX-Attach` header) and hands the `.eml` +
+  brief PDF to Gerhard — never commits them to a public repo. Until a draft is seen under
+  gerhard@cttx.co.za → Drafts, report **EMAIL INTEGRATION NOT VERIFIED**.
   A Gmail draft is not a CTTX draft; do not create one as a substitute.
 - **Public repo:** this skill lives in a public GitHub repo. Prospect data, emails, records and briefs
   never go into the repo — only into Notion and the session scratchpad.
@@ -43,6 +45,7 @@ CTTX Pipeline (Notion)  ──► 1 SELECT batch (lib/batch_rank.py)
   Surface every spend (estimated, actual, new balance).
 
 ## Step 0 — Reply desk and reconciliation (ALWAYS FIRST — before any new research)
+Work every live reply with `references/win-patterns.md` — especially "we already have X" replies.
 Live conversations beat new names. The first live run (3 Oct 2026) found 7 replies to the 25–28 Sep
 wave sitting unanswered while the pipeline still showed those prospects as "Not Contacted", and the
 engine re-researched a warm lead (Buffalo Kloof) as if it were cold. Never again:
@@ -129,5 +132,6 @@ EMAIL INTEGRATION status, and one line **Next action: …**.
 | `references/cadence.md` | Daily/weekly loop, Routine prompt, follow-up sequence, KPIs |
 | `lib/batch_rank.py` | Dedupe + rank pipeline rows into a batch |
 | `lib/contact_finder.py` | Email pattern inference and candidate ranking (stdlib only) |
-| `tools/push_outlook_drafts.ps1` | Gerhard's PC: create Outlook drafts in the CTTX account from draft JSON |
+| `lib/write_eml.py` | Draft → `.eml` in the existing Load CTTX Drafts loader's convention |
+| `references/win-patterns.md` | How CTTX deals actually advance (MTO, Kwandwe) — the moves the engine must enable |
 | `tests/test_engine.py` | Offline tests for both libs (`python3 tests/test_engine.py`) |

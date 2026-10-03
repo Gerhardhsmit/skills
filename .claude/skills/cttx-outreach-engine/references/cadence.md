@@ -7,7 +7,7 @@
    Gerhard has sent (Stage = Contacted) and no reply exists in Gmail (search the thread first).
 3. Write the run report to Notion as a page under 📈 Sales & Pipeline titled
    `Outreach Engine Run — YYYY-MM-DD` and end with **Next action**.
-Gerhard's part: open the run page, review the drafts, run `push_outlook_drafts.ps1` (or paste), send
+Gerhard's part: open the run page, review the drafts, drop the .eml + PDF into Desktop\CTTX Prospect Drafts and run "Load CTTX Drafts", send
 from Outlook, move Stage to Contacted.
 
 ## Follow-up sequence (all drafts, Gerhard sends)
