@@ -112,6 +112,21 @@ check).** Before the brief describes ANY route, hub, relay or "joins site A to s
    next step; it does NOT draw a backbone. Gate item 7 (hypothesis) fails if a route is claimed unscreened.
 5. Record the screen table in the Discovery Record (internal) with assumed heights and frequency.
 
+**Large sites: the link plan IS part of the first proposal (Gerhard, 3 Oct 2026).** A prospect is LARGE
+when it has 3 or more sites to join, or sites more than 3 km apart (multi-dairy hubs, estates with
+several farms, reserves with several lodges, plantations, wind farms). For a large site:
+1. Build `plan.json` (sites with pins and assumed mast heights, hops with roles: carrier option /
+   backbone / backup) and run `python3 lib/terrain_screen.py plan.json --plan <out>`. Iterate:
+   blocked hop → `--relay` search → re-plan, until every backbone hop is CLEAR with ≥ 20 dB fade
+   margin (use `"radio": {"gain_dbi": 29}` for a 2 ft dish on long hops).
+2. The brief gets a **Link plan page** (map, hop table with km/azimuth/mast/Fresnel/fade margin) and a
+   **Terrain profiles page**, from `plan_files()` output. Model: the MTO hop-by-hop plan that won the PO.
+3. The plan states its limits on the page: public elevation data, planning-class radios, pins marked
+   estimated, relay sites "candidate — field verify", hubs not yet studied.
+4. Send `links.kml` with the draft (Abel's LINKPlanner and the client's Google Earth both open it).
+5. A large site with no pins for its main sites FAILS the gate: research the pins (listings, Maps,
+   company pages, satellite) — never send a large-site brief without its link plan.
+
 ## Step 5–6 — Gate and package
 Run the nine-item Outreach Quality Gate. PASS → SIGNAL brief (`assets/signal-brief-template.html`
 from the discovery skill, rendered to PDF with `/opt/pw-browsers/chromium` in cloud sessions) and a

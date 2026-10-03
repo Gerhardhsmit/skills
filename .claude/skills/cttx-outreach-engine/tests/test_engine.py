@@ -124,6 +124,11 @@ class TerrainScreenTest(unittest.TestCase):
         r = ts.screen(self.A, self.B, 1, 1, elev_fn=lambda la, lo: 0.0)
         self.assertGreater(r["clear_m"], 0)
 
+    def test_planning_budget(self):
+        # 5.8 GHz, 2x25 dBi, 20 dBm, -75 dBm sens, 2 dB misc: ~20.7 dB fade at 5.35 km
+        self.assertAlmostEqual(ts.budget(5.35)["fade_db"], 20.7, delta=0.2)
+        self.assertGreater(ts.budget(7.2, {**ts.PLAN_CLASS, "gain_dbi": 29})["fade_db"], 20)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
