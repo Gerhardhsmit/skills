@@ -90,8 +90,9 @@ def verdict(ratio):
     return "CLEAR" if ratio >= 0.6 else "MARGINAL" if ratio >= 0 else "BLOCKED"
 
 
-def screen(a, b, ha, hb, freq_ghz=5.8, k=4 / 3, n=200, elev_fn=elev):
+def screen(a, b, ha, hb, freq_ghz=5.8, k=4 / 3, n=200, elev_fn=None):
     """Worst Fresnel-ratio point on the path a->b. ha/hb are antenna heights above ground (m)."""
+    elev_fn = elev_fn or (lambda la, lo: elev(la, lo))
     d = km(a, b)
     if d == 0:
         raise ValueError("identical points")

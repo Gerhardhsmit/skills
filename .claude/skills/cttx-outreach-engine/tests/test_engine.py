@@ -9,6 +9,7 @@ import batch_rank  # noqa: E402
 import contact_finder as cf  # noqa: E402
 import write_eml  # noqa: E402
 import terrain_screen as ts  # noqa: E402
+import site_workup  # noqa: E402
 
 
 class ContactFinder(unittest.TestCase):
@@ -128,6 +129,38 @@ class TerrainScreenTest(unittest.TestCase):
         # 5.8 GHz, 2x25 dBi, 20 dBm, -75 dBm sens, 2 dB misc: ~20.7 dB fade at 5.35 km
         self.assertAlmostEqual(ts.budget(5.35)["fade_db"], 20.7, delta=0.2)
         self.assertGreater(ts.budget(7.2, {**ts.PLAN_CLASS, "gain_dbi": 29})["fade_db"], 20)
+
+
+
+class SiteWorkupTest(unittest.TestCase):
+    """Offline: a ridge hides one site; the workup must find a relay and connect everything."""
+
+    def setUp(self):
+        import tempfile
+        self.tmp = tempfile.mkdtemp()
+        self._elev, self._masts = ts.elev, site_workup.mast_index
+        # flat 100 m with a 140 m ridge band at lon 25.045-25.05; a 200 m knoll at (−33.03, 25.04)
+        def fake(la, lo):
+            if abs(la + 33.03) < 0.003 and abs(lo - 25.04) < 0.003:
+                return 200.0
+            return 140.0 if 25.045 < lo < 25.05 and la > -33.025 else 100.0
+        ts.elev = fake
+        site_workup.mast_index = lambda: [{"id": "X1", "name": "pt", "lat": -33.03, "lon": 25.0, "service_level": "BRONZE"}]
+
+    def tearDown(self):
+        ts.elev, site_workup.mast_index = self._elev, self._masts
+
+    def test_relay_found_and_all_connected(self):
+        sites = {"Hub": {"lat": -33.0, "lon": 25.0, "role": "hub"},
+                 "Near": {"lat": -33.01, "lon": 25.01, "role": "site"},
+                 "Hidden": {"lat": -33.0, "lon": 25.09, "role": "site"}}
+        out = site_workup.workup(sites, self.tmp, imagery=False)
+        self.assertEqual(out["unreached"], [])
+        self.assertTrue(out["relays"])
+        self.assertTrue(out["all_hops_pass"])
+        self.assertIsNotNone(out["carrier_primary"])
+        for f in ("plan.json", "carrier.json", "plan.html", "screen.txt", "plan_out/links.kml"):
+            self.assertTrue(os.path.exists(os.path.join(self.tmp, f)), f)
 
 
 if __name__ == "__main__":

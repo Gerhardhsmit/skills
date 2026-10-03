@@ -115,10 +115,13 @@ check).** Before the brief describes ANY route, hub, relay or "joins site A to s
 **Large sites: the link plan IS part of the first proposal (Gerhard, 3 Oct 2026).** A prospect is LARGE
 when it has 3 or more sites to join, or sites more than 3 km apart (multi-dairy hubs, estates with
 several farms, reserves with several lodges, plantations, wind farms). For a large site:
-1. Build `plan.json` (sites with pins and assumed mast heights, hops with roles: carrier option /
-   backbone / backup) and run `python3 lib/terrain_screen.py plan.json --plan <out>`. Iterate:
-   blocked hop → `--relay` search → re-plan, until every backbone hop is CLEAR with ≥ 20 dB fade
-   margin (use `"radio": {"gain_dbi": 29}` for a 2 ft dish on long hops).
+1. Run the **site workup** (`references/site-workup.md`): `python3 lib/site_workup.py sites.json <out>`.
+   It screens every pair, finds relays on the hill that blocks the valley (preferring a crest that
+   also sees a carrier point), builds the minimum-cost backbone, screens the Vodacom-sourced carrier
+   points for a primary + backup handover, and writes plan pages, KML and Sentinel-2 views. Do not
+   continue until `summary.json` shows `unreached: []` and `all_hops_pass: true`. Look at every relay
+   in `sat_<relay>_zoom.png` and record tracks, fences, power and structures (the Google Earth Pro
+   checklist in the reference is for Gerhard/Abel on the PC).
 2. The brief gets a **Link plan page** (map, hop table with km/azimuth/mast/Fresnel/fade margin) and a
    **Terrain profiles page**, from `plan_files()` output. Model: the MTO hop-by-hop plan that won the PO.
 3. The plan states its limits on the page: public elevation data, planning-class radios, pins marked
@@ -159,6 +162,9 @@ EMAIL INTEGRATION status, and one line **Next action: …**.
 | `references/cadence.md` | Daily/weekly loop, Routine prompt, follow-up sequence, KPIs |
 | `lib/batch_rank.py` | Dedupe + rank pipeline rows into a batch |
 | `lib/contact_finder.py` | Email pattern inference and candidate ranking (stdlib only) |
+| `lib/site_workup.py` | One-command large-site workup: relays, backbone, carrier handover, plan pages, imagery |
+| `lib/site_imagery.py` | Sentinel-2 views of the site area and relay crests (needs rasterio) |
+| `references/site-workup.md` | Site workup procedure + Google Earth checklist for relay crests |
 | `lib/terrain_screen.py` | Desk-study terrain/Fresnel screen + relay search (stdlib, AWS terrain tiles) |
 | `lib/write_eml.py` | Draft → `.eml` in the existing Load CTTX Drafts loader's convention |
 | `references/win-patterns.md` | How CTTX deals actually advance (MTO, Kwandwe) — the moves the engine must enable |
