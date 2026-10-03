@@ -59,6 +59,12 @@ contact) through Phase 8. Parallelise prospects with sub-agents when available; 
 prospect and the rules above. Prior contact found in Phase 0 changes the draft — never cold-pitch a
 warm relationship.
 
+**Cloud-session lesson (first run, 3 Oct 2026):** the cloud egress proxy blocks direct fetches of most
+company websites and trade press, so workers rely on search-result extracts. That is acceptable for
+discovery, but every draft must carry a "re-open these source pages before sending" note listing the
+URLs behind any figure quoted to the client. Apollo "verified" on a catch-all domain counts as
+INFERRED (the draft JSON gets `email_status: INFERRED`, which prefixes "[VERIFY ADDRESS]").
+
 ## Step 3 — Locate the owner (the bottleneck)
 Follow `references/owner-contact-playbook.md` end to end. Record `contact.json` per prospect:
 name, role, email, `email_status` (PUBLISHED / VERIFIED / INFERRED / NONE), every source, credits spent.

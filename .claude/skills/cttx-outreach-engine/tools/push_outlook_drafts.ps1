@@ -53,7 +53,11 @@ Get-ChildItem -Path $Folder -Filter *.draft.json | ForEach-Object {
   $bodyHtml = ($d.body -replace "&", "&amp;" -replace "<", "&lt;" -replace ">", "&gt;") -replace "`r?`n", "<br>"
   if ($Signature -and (Test-Path $Signature)) { $sig = Get-Content $Signature -Raw }
   $mail.HTMLBody = "<div style='font-family:Calibri,Arial;font-size:11pt'>$bodyHtml</div>" + $sig
-  foreach ($p in $d.attachments) { if ($p -and (Test-Path $p)) { $mail.Attachments.Add($p) | Out-Null } }
+  foreach ($p in $d.attachments) {
+    if (-not $p) { continue }
+    if (-not [System.IO.Path]::IsPathRooted($p)) { $p = Join-Path $Folder $p }   # brief PDF sits beside the JSON
+    if (Test-Path $p) { $mail.Attachments.Add($p) | Out-Null } else { Write-Warning "Attachment not found: $p" }
+  }
   $mail.Save()
   $mail.Close(0)                                      # olSave — closes the inspector, keeps the draft
   Move-Item $_.FullName (Join-Path $pushed $_.Name) -Force
