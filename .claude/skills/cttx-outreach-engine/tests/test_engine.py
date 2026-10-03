@@ -8,6 +8,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "lib"))
 import batch_rank  # noqa: E402
 import contact_finder as cf  # noqa: E402
 import write_eml  # noqa: E402
+import terrain_screen as ts  # noqa: E402
 
 
 class ContactFinder(unittest.TestCase):
@@ -102,6 +103,26 @@ class BatchRank(unittest.TestCase):
         self.assertEqual(batch_rank.email_kind("reservations@x.co.za"), "generic")
         self.assertEqual(batch_rank.email_kind("jan@x.co.za"), "named")
         self.assertEqual(batch_rank.email_kind(None), "none")
+
+
+class TerrainScreenTest(unittest.TestCase):
+    """Offline: synthetic terrain, no tile downloads."""
+    A, B = (-33.0, 25.0), (-33.0, 25.06)  # ~5.6 km east-west
+
+    def test_flat_ground_clear(self):
+        r = ts.screen(self.A, self.B, 15, 15, elev_fn=lambda la, lo: 100.0)
+        self.assertEqual(r["verdict"], "CLEAR")
+
+    def test_ridge_blocks(self):
+        ridge = lambda la, lo: 160.0 if 25.029 < lo < 25.031 else 100.0
+        r = ts.screen(self.A, self.B, 15, 15, elev_fn=ridge)
+        self.assertEqual(r["verdict"], "BLOCKED")
+        self.assertAlmostEqual(r["at_km"], 2.8, delta=0.2)
+
+    def test_earth_bulge_metres(self):
+        # 5.6 km flat path, 1 m antennas: bulge ~0.46 m mid-path must not block outright
+        r = ts.screen(self.A, self.B, 1, 1, elev_fn=lambda la, lo: 0.0)
+        self.assertGreater(r["clear_m"], 0)
 
 
 if __name__ == "__main__":

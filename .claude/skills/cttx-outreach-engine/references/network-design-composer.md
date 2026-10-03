@@ -4,8 +4,11 @@ Purpose: turn a Discovery Record into a **customer-specific network concept** an
 without claiming feasibility. The concept is built from THEIR assets and THEIR losses, found in discovery.
 It is never copied from another client or a sector template.
 
-Feasibility (terrain, LOS, Fresnel, capacity, power, mast heights) comes later in the paid assessment via
-`cttx-link-assessment-architect`. Pricing only via `infrastructure-project-quoting-estimation`.
+Full feasibility (LINKPlanner, capacity, power, real mast heights) comes in the paid assessment via
+`cttx-link-assessment-architect`. But no topology is written into a customer brief until
+`lib/terrain_screen.py` has screened every hop it names (SKILL.md desk-study rule). Layer 2 below is
+chosen FROM the screen result, not from the map's look: a river valley is not a corridor until the
+profile says so. Pricing only via `infrastructure-project-quoting-estimation`.
 
 ## Layer 0 — Inventory (from discovery, every item sourced)
 List each place where value is made, stored, moved or lost:

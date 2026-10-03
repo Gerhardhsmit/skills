@@ -100,6 +100,18 @@ outcome and ROI lens → "Cost of Disconnection vs Value of Connected Operations
 `cttx-link-assessment-architect` Mode B (`lib/masts.py near <lat> <lon> 40`) where coordinates exist;
 historical mast points are never called "working masts" and no LOS is claimed without terrain data.
 
+**Desk-study rule (added 3 Oct 2026 after a brief claimed a valley backbone with no terrain
+check).** Before the brief describes ANY route, hub, relay or "joins site A to site B":
+1. Get pins for every site named (published coordinates, ≥1 source each; mark ASSUMED where estimated).
+2. Run `python3 lib/terrain_screen.py sites.json` (AWS terrain tiles, reachable from cloud sessions) and,
+   for any BLOCKED site, `--relay <site> --to <a>,<b>` to look for high ground.
+3. The brief may only describe what the screen supports, in screen language: "a terrain screen of public
+   elevation data suggests the main dairy needs a hilltop relay; the two southern dairies look clear". Never "line of
+   sight confirmed", never a route the screen shows BLOCKED, never a site with no pin.
+4. No pins / screen not run → the brief describes the business problem and offers the desk study as the
+   next step; it does NOT draw a backbone. Gate item 7 (hypothesis) fails if a route is claimed unscreened.
+5. Record the screen table in the Discovery Record (internal) with assumed heights and frequency.
+
 ## Step 5–6 — Gate and package
 Run the nine-item Outreach Quality Gate. PASS → SIGNAL brief (`assets/signal-brief-template.html`
 from the discovery skill, rendered to PDF with `/opt/pw-browsers/chromium` in cloud sessions) and a
@@ -132,6 +144,7 @@ EMAIL INTEGRATION status, and one line **Next action: …**.
 | `references/cadence.md` | Daily/weekly loop, Routine prompt, follow-up sequence, KPIs |
 | `lib/batch_rank.py` | Dedupe + rank pipeline rows into a batch |
 | `lib/contact_finder.py` | Email pattern inference and candidate ranking (stdlib only) |
+| `lib/terrain_screen.py` | Desk-study terrain/Fresnel screen + relay search (stdlib, AWS terrain tiles) |
 | `lib/write_eml.py` | Draft → `.eml` in the existing Load CTTX Drafts loader's convention |
 | `references/win-patterns.md` | How CTTX deals actually advance (MTO, Kwandwe) — the moves the engine must enable |
 | `tests/test_engine.py` | Offline tests for both libs (`python3 tests/test_engine.py`) |
